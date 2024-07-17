@@ -108,7 +108,7 @@ def clean_data(df):
     return df
 
 
-def main():
+def run():
     if not check_api_status():
         exit(1)
 
@@ -152,4 +152,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run()
