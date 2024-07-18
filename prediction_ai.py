@@ -326,13 +326,13 @@ def plot_predictions(group_index, actual, kalman, lstm):
     lstm = lstm[:min_length]
 
     plt.figure(figsize=(12, 8))
-    plt.plot(actual[:, 0], actual[:, 1], marker='o', markersize=8, linestyle='-', label='Actual Position', color='blue')
-    plt.plot(kalman[:, 0], kalman[:, 1], marker='x', markersize=10, linestyle='--', label='Kalman Filter Prediction', color='red')
-    plt.plot(lstm[:, 0], lstm[:, 1], marker='s', markersize=6, linestyle=':', label='LSTM Prediction', color='green')
+    plt.plot(actual[:, 0], actual[:, 1], marker='o', markersize=6, linestyle='-', label='Actual Position', color='blue')
+    plt.plot(kalman[:, 0], kalman[:, 1], marker='x', markersize=8, linestyle='--', label='Kalman Filter Prediction', color='red')
+    plt.plot(lstm[:, 0], lstm[:, 1], marker='s', markersize=4, linestyle=':', label='LSTM Prediction', color='green')
     plt.xlabel('Longitude')
     plt.ylabel('Latitude')
     plt.title(f'Vehicle Route Prediction - Group {group_index}')
-    plt.legend()
+    plt.legend(loc='best')
     plt.grid(True)
     plt.show()
     logging.info(f"Prediction plot for group {group_index} complete.")
@@ -389,7 +389,7 @@ def main(csv_file):
 
     history = lstm_model.fit(
         train_dataset,
-        epochs=50,
+        epochs=5000,
         validation_data=val_dataset,
         callbacks=[early_stopping, checkpoint],
         verbose=1
