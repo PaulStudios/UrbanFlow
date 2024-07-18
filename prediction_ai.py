@@ -13,7 +13,9 @@ import matplotlib.pyplot as plt
 import os
 import concurrent.futures
 import logging
+import download_data
 
+download_data.run()
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -50,10 +52,15 @@ def add_velocity_acceleration(X):
     np.ndarray: Data array with added velocity and acceleration features.
     """
     logging.info("Adding velocity and acceleration features.")
-    velocity = np.diff(X[:, :2], axis=0)
-    acceleration = np.diff(velocity, axis=0)
-    velocity = np.vstack([np.zeros((1, 2)), velocity])
-    acceleration = np.vstack([np.zeros((2, 2)), acceleration])
+    if len(X) < 3:
+        # Handle cases with insufficient data points
+        velocity = np.zeros((len(X), 2))
+        acceleration = np.zeros((len(X), 2))
+    else:
+        velocity = np.diff(X[:, :2], axis=0)
+        acceleration = np.diff(velocity, axis=0)
+        velocity = np.vstack([np.zeros((1, 2)), velocity])
+        acceleration = np.vstack([np.zeros((2, 2)), acceleration])
     return np.hstack([X, velocity, acceleration])
 
 def prepare_data(grouped):
@@ -382,7 +389,7 @@ def main(csv_file):
 
     history = lstm_model.fit(
         train_dataset,
-        epochs=20,
+        epochs=50,
         validation_data=val_dataset,
         callbacks=[early_stopping, checkpoint],
         verbose=1

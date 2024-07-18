@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+from haversine import haversine, Unit
 import logging
 
 # Set up logging
@@ -94,9 +95,92 @@ def get_data_links(user_id, project_id):
     return []
 
 
+def calculate_distance(coords1, coords2):
+    """
+    Calculate the great-circle distance between two points
+    on the Earth's surface using the Haversine formula.
+
+    Parameters:
+    - coords1 (tuple): Latitude and longitude of point 1 in decimal degrees (lat, lon).
+    - coords2 (tuple): Latitude and longitude of point 2 in decimal degrees (lat, lon).
+
+    Returns:
+    - distance (float): Distance between the two points in meters.
+    """
+    return haversine(coords1, coords2, unit=Unit.METERS)
+
+
+def filter_standing_still(df, threshold=5):
+    """
+    Filter out datasets where movement is negligible (standing still) based on distance thresholds.
+    If any point in an upload_id set is below the threshold, the entire set is removed.
+
+    Parameters:
+    - df (pd.DataFrame): Input DataFrame containing columns: longitude, latitude, timestamp, upload_id.
+    - threshold (float): Minimum distance threshold in meters to consider movement significant.
+                        Defaults to 5 meters.
+
+    Returns:
+    - filtered_df (pd.DataFrame): Filtered DataFrame containing rows where movement is significant.
+    Raises:
+    - RuntimeError: If an unexpected error occurs during filtering.
+    """
+    logging.info("Filtering standing still data...")
+
+    try:
+        # Ensure columns are named correctly (adjust if necessary)
+        required_columns = ['longitude', 'latitude', 'timestamp', 'upload_id']
+        if not all(col in df.columns for col in required_columns):
+            raise ValueError(
+                "Input DataFrame does not contain required columns: longitude, latitude, timestamp, upload_id")
+
+        # Sort dataframe by upload_id and timestamp
+        df.sort_values(by=['upload_id', 'timestamp'], inplace=True)
+
+        # Calculate distances between consecutive points for each upload_id
+        df['next_latitude'] = df.groupby('upload_id')['latitude'].shift(-1)
+        df['next_longitude'] = df.groupby('upload_id')['longitude'].shift(-1)
+
+        def calculate_distance_row(row):
+            """
+            Calculate distance between current and next coordinates in a dataframe row.
+
+            Parameters:
+            - row (pd.Series): Row containing latitude, longitude, next_latitude, next_longitude.
+
+            Returns:
+            - bool: True if distance is above threshold, False otherwise.
+            """
+            coords1 = (row['latitude'], row['longitude'])
+            coords2 = (row['next_latitude'], row['next_longitude'])
+            dist = calculate_distance(coords1, coords2) if pd.notnull(row['next_latitude']) else None
+            return dist >= threshold if dist is not None else False
+
+        # Apply function to calculate distance for each row
+        df['validity'] = df.apply(calculate_distance_row, axis=1)
+
+        # Filter rows where movement is significant (validity is True)
+        valid_df = df[df['validity'] == True]
+
+        # Filter upload_id groups with more than 5 rows
+        filtered_df = valid_df.groupby('upload_id').filter(lambda x: len(x) > 5)
+
+        # Drop temporary columns
+        filtered_df.drop(['next_latitude', 'next_longitude', 'validity'], axis=1, inplace=True)
+
+        logging.info("Data filtered successfully")
+        logging.info(f"Rows before filtering: {len(df)}, after filtering: {len(filtered_df)}")
+
+        return filtered_df
+
+    except Exception as e:
+        logging.error(f"Error occurred: {str(e)}")
+        raise RuntimeError(f"Error occurred: {str(e)}")
+
+
 def clean_data(df):
     """
-    Perform basic data cleaning operations on the DataFrame.
+    Perform data cleaning operations on the DataFrame.
 
     Args:
         df (pd.DataFrame): The DataFrame to clean.
@@ -110,8 +194,9 @@ def clean_data(df):
     df.drop("user_id", axis="columns", inplace=True)
     df.drop("project_id", axis="columns", inplace=True)
     df.drop_duplicates(inplace=True)  # Remove duplicates
+    clean_df = filter_standing_still(df)
     logging.info("Data cleaning complete")
-    return df
+    return clean_df
 
 
 def run():
@@ -143,7 +228,7 @@ def run():
             data_set.extend(response.json())
         else:
             logging.warning(f"Failed to retrieve data from {link}")
-            logging.error(f"Status code: {r.status_code}")
+            logging.error(f"Status code: {response.status_code}")
         logging.info(f"Progress: {i}/{len(data_links)} links processed")
 
     if not data_set:
