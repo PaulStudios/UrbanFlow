@@ -63,7 +63,8 @@ def get_user_list(project_id):
         logging.info(f"Retrieved user list for project ID {project_id}")
         return r.json()
     logging.error(f"Failed to retrieve user list for project ID {project_id}")
-    return None
+    logging.error(f"Status code: {r.status_code}")
+    return []
 
 
 def get_data_links(user_id, project_id):
@@ -89,6 +90,7 @@ def get_data_links(user_id, project_id):
         logging.info(f"Retrieved data links for user ID {user_id}")
         return link_list
     logging.warning(f"Failed to retrieve data links for user ID {user_id}")
+    logging.error(f"Status code: {r.status_code}")
     return []
 
 
@@ -103,6 +105,10 @@ def clean_data(df):
         pd.DataFrame: The cleaned DataFrame.
     """
     df.dropna(inplace=True)  # Remove rows with missing values
+    df.drop("data_id", axis="columns", inplace=True)
+    df.drop("id", axis="columns", inplace=True)
+    df.drop("user_id", axis="columns", inplace=True)
+    df.drop("project_id", axis="columns", inplace=True)
     df.drop_duplicates(inplace=True)  # Remove duplicates
     logging.info("Data cleaning complete")
     return df
@@ -137,6 +143,7 @@ def run():
             data_set.extend(response.json())
         else:
             logging.warning(f"Failed to retrieve data from {link}")
+            logging.error(f"Status code: {r.status_code}")
         logging.info(f"Progress: {i}/{len(data_links)} links processed")
 
     if not data_set:
