@@ -83,6 +83,19 @@ def get_data_links(user_id, project_id):
     r = requests.get(url)
     if r.status_code == 200:
         data_list = r.json()
+        # Dictionary to store unique entries by timestamp
+        unique_data = {}
+
+        # Iterate over the data and store entries with unique timestamps
+        for entry in data_list:
+            timestamp = entry['latest_timestamp']
+            if timestamp not in unique_data:
+                unique_data[timestamp] = entry
+
+        # Convert the dictionary back to a list
+        filtered_data = list(unique_data.values())
+        data_list = filtered_data
+
         link_list = []
         for data in data_list:
             data_id = data["upload_id"]
