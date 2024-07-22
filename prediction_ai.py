@@ -39,8 +39,9 @@ from tensorflow.keras.regularizers import l2
 from xgboost import XGBRegressor
 
 # Download training data
+import download_data
 
-# download_data.run()
+download_data.run()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
