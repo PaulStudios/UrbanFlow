@@ -241,7 +241,7 @@ Contributions to UrbanFlow are welcome! For major changes, please open an issue 
 ## Acknowledgments
 - This project was developed as part of the ISEF project by Indradip Paul.
 - Special thanks to my mentor for guidance and support.
-- 
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
