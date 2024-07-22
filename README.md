@@ -198,10 +198,17 @@ Combines predictions of different models, giving different weights to each model
 | Regularized Stacking | 0.0113  | 0.1065  | 0.049 | 0.989    | 0.989    | 12.998%  | Excellent   |
 | Weighted Average     | 0.0011  | 0.0327  | 0.005 | 0.999    | 0.999    | 1.107%   | Excellent   |
 
+![Bar Graph](results/evaluation_results.png?raw=true)
+
 ## Visual Analysis of Predictions
 
 The visual predictions demonstrate a strong alignment with the actual paths across all models, showcasing their
 effectiveness in capturing the underlying trends.
+
+![Graph 1](results/group_0_predictions.png)
+![Graph 2](results/group_1_predictions.png)
+![Graph 3](results/group_2_predictions.png)
+![Graph 4](results/group_4_predictions.png)
 
 ### Random Forest
 
@@ -227,3 +234,16 @@ The UrbanFlow project shows how different machine learning models can be used to
 traffic management. The best-performing models, such as Random Forest, XGBoost, Ensemble, and GRU, offer high accuracy
 and reliability, making them ideal for optimizing urban traffic flow. Other models, while not as accurate, provide
 insights into different approaches to solving the problem.
+
+## Contributing
+Contributions to UrbanFlow are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
+## Acknowledgments
+- This project was developed as part of the ISEF project by Indradip Paul.
+- Special thanks to my mentor for guidance and support.
+- 
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+For questions or support, please contact [me](mailto:indradip.paul@outlook.com).
