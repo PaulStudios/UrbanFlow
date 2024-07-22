@@ -1,3 +1,16 @@
+"""
+Author: Indradip Paul [HilFing]
+Purpose: This file is part of the UrbanFlow project, designed to manage traffic lights to prioritize emergency vehicles and improve overall traffic flow.
+         Specifically, this file focuses on the implementation and evaluation of various machine learning models for predicting vehicle routes.
+Release Date: 23-07-2024
+
+Additional Information:
+- This project leverages both traditional machine learning models and advanced deep learning architectures to provide robust predictions.
+- The models evaluated include Random Forest, XGBoost, Ensemble, GRU, CNN-LSTM, Stacked LSTM, Optimized LSTM, BiLSTM, SVM, k-NN, Regularized Stacking, and Weighted Average.
+- Performance metrics used for evaluation include Mean Squared Error (MSE), Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), Coefficient of Determination (R²), Explained Variance Score (EVS), and Mean Absolute Percentage Error (MAPE).
+- The goal is to identify the most accurate and reliable models for real-time traffic management and route prediction.
+"""
+
 import concurrent.futures
 import gc
 import json
@@ -40,9 +53,6 @@ from tensorflow.keras.regularizers import l2
 from xgboost import XGBRegressor
 
 import download_data
-
-# Download training data
-download_data.run()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -588,7 +598,7 @@ def train_model(model, train_dataset, val_dataset, model_name):
         history = run_with_timeout(train_with_timeout, timeout_duration=7200)  # 2 hour timeout
 
         # Save training history to a JSON file
-        with open(f'train_history/{model_name}_history.json', 'w') as f:
+        with open(f'outputs/train_history/{model_name}_history.json', 'w') as f:
             json.dump(history.history, f)
 
         return model
@@ -801,7 +811,7 @@ def save_hyperparameters(params, model_name):
     Returns:
         None
     """
-    filename = f'hyperparameters/best_hyperparameters_{model_name}.json'
+    filename = f'outputs/hyperparameters/best_hyperparameters_{model_name}.json'
     with open(filename, 'w') as f:
         json.dump(params, f)
     logging.info(f"Best hyperparameters for {model_name} saved to {filename}")
@@ -817,7 +827,7 @@ def load_hyperparameters(model_name):
     Returns:
         dict or None: Loaded hyperparameters if the file exists, None otherwise.
     """
-    filename = f'hyperparameters/best_hyperparameters_{model_name}.json'
+    filename = f'outputs/hyperparameters/best_hyperparameters_{model_name}.json'
     try:
         with open(filename, 'r') as f:
             params = json.load(f)
@@ -1564,7 +1574,7 @@ def evaluate_models(y_true, predictions, model_names):
         logging.info(f"  EVS: {evs:.4f}")
         logging.info(f"  MAPE: {mape:.4f}%")
 
-    with open('results/evaluation_results.json', 'w') as f:
+    with open('outputs/results/evaluation_results.json', 'w') as f:
         json.dump(results, f)
 
     return results
@@ -1591,7 +1601,7 @@ def plot_evaluation_results(results):
         axes[i].set_ylabel('Value')
 
     plt.tight_layout()
-    plt.savefig('results/evaluation_results.png')
+    plt.savefig('outputs/results/evaluation_results.png')
     plt.show()
 
 
@@ -1817,7 +1827,7 @@ def plot_predictions(group_index, actual, lstm, bilstm, stacked_lstm, cnn_lstm, 
     plt.title(f'Vehicle Route Prediction - Group {group_index}')
     plt.legend(loc='best')
     plt.grid(True)
-    plt.savefig(f'results/group_{group_index}_predictions.png')
+    plt.savefig(f'outputs/results/group_{group_index}_predictions.png')
     plt.show()
     logging.info(f"Prediction plot for group {group_index} complete.")
 
@@ -1855,21 +1865,21 @@ def predict_with_proper_shape(model, X):
         return model.predict(X)
 
 
-def main(data_csv_file):
+def main():
     """
     The main function to run the script
-
-    Args:
-        data_csv_file (string): the name of the csv file
     """
     # Create the required output directories
-    create_directory("train_history")
-    create_directory("models")
-    create_directory("results")
-    create_directory("hyperparameters")
+    create_directory("outputs/train_history")
+    create_directory("outputs/models")
+    create_directory("outputs/results")
+    create_directory("outputs/hyperparameters")
+
+    # Download training data
+    download_data.run()
 
     # Load and prepare the data
-    data = load_data(data_csv_file)
+    data = load_data("final_data.csv")
     grouped = data.groupby('upload_id')
     X_groups, y_groups = prepare_data(grouped, seq_length=30)
 
@@ -2166,13 +2176,12 @@ def main(data_csv_file):
     # Save the final models
     for model, name in zip(models, model_names):  # Save only the base models
         if isinstance(model, tf.keras.Model):
-            model.save(f'models/final_{name}_model.keras')
+            model.save(f'outputs/models/final_{name}_model.keras')
         else:
-            joblib.dump(model, f'models/final_{name}_model.joblib')
+            joblib.dump(model, f'outputs/models/final_{name}_model.joblib')
 
     logging.info("Training and evaluation complete.")
 
 
 if __name__ == "__main__":
-    csv_file = 'final_data.csv'
-    main(csv_file)
+    main()
