@@ -14,16 +14,26 @@ def plot_evaluation_results(results):
     models = list(results.keys())
 
     fig, axes = plt.subplots(len(metrics), 1, figsize=(12, 5 * len(metrics)))
-    fig.suptitle('Model Evaluation Results')
+
+    # Ensure axes is always a list, even for a single subplot
+    if len(metrics) == 1:
+        axes = [axes]
 
     for i, metric in enumerate(metrics):
         values = [results[model][metric] for model in models]
-        axes[i].bar(models, values)
+        x = range(len(models))
+        axes[i].bar(x, values)
         axes[i].set_title(metric)
+        axes[i].set_xticks(x)
         axes[i].set_xticklabels(models, rotation=45, ha='right')
         axes[i].set_ylabel('Value')
 
-    plt.tight_layout()
+    # Adjust the layout to make room for the suptitle
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+
+    # Add suptitle after adjusting the layout
+    fig.suptitle('Model Evaluation Results', fontsize=16, y=0.98)
+
     plt.savefig('outputs/results/evaluation_results.png')
     plt.show()
 
