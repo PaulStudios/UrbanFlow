@@ -1,15 +1,19 @@
 import concurrent
+import gc
 import warnings
 
 import optuna
+import tensorflow as tf
 from optuna.samplers import TPESampler
 from sklearn.exceptions import ConvergenceWarning
 
 from modules.config import hyperparameter_rounds
-from modules.hyperparams.objectives import objective, objective_xgb, objective_rf, objective_stacking, \
+from modules.hyperparams.objectives import objective_xgb, objective_rf, objective_stacking, \
     objective_reg_stacking
 from modules.hyperparams.save_and_load import load_hyperparameters, save_hyperparameters
 from modules.utilities import logging, run_with_timeout
+
+tf.keras.mixed_precision.set_global_policy('mixed_float16')
 
 
 def create_study(name, objective):
@@ -47,6 +51,8 @@ def optimize_model(name, objective, X_train_groups, y_train_groups, X_train_padd
     Returns:
         tuple: The model name and the best hyperparameters.
     """
+    gc.collect()
+
     study, func = create_study(name, objective)
     if study is not None and func is not None:
         try:
@@ -120,36 +126,3 @@ def optimize_hyperparameters(X_train_groups, y_train_groups, X_train_padded, y_t
     reg_stacking = params['reg_stacking']
     return xgb, rf, stacking, reg_stacking
 
-
-def optimize_hyperparameters_base(X_train, y_train, X_val, y_val, timeout=3600):
-    """
-    Optimize hyperparameters for the base LSTM model using Optuna.
-
-    Args:
-        X_train (array-like): Training data.
-        y_train (array-like): Training target values.
-        X_val (array-like): Validation data.
-        y_val (array-like): Validation target values.
-        timeout (int): Timeout for optimization in seconds.
-
-    Returns:
-        dict: Best hyperparameters.
-    """
-    logging.info("Starting hyperparameter optimization")
-
-    study = optuna.create_study(direction='minimize', sampler=TPESampler())
-
-    try:
-        study.optimize(lambda trial: objective(trial, X_train, y_train, X_val, y_val),
-                       n_trials=hyperparameter_rounds,
-                       timeout=timeout,
-                       n_jobs=-1,
-                       show_progress_bar=True)
-    except KeyboardInterrupt:
-        logging.info("Optimization interrupted by user.")
-
-    logging.info(f"Best trial: {study.best_trial.number}")
-    logging.info(f"Best value: {study.best_value}")
-    logging.info(f"Best hyperparameters: {study.best_params}")
-
-    return study.best_params

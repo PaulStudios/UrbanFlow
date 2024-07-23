@@ -27,15 +27,14 @@ from sklearn.svm import SVR
 from xgboost import XGBRegressor
 
 import download_data
-from modules.config import training_rounds
+from modules.config import training_rounds, parallel_workers
 from modules.data.load_data import load_data
 from modules.data.preprocessing import prepare_data, split_data, normalize_data
 from modules.evaluation.evaluate import evaluate_models
 from modules.evaluation.plotting import plot_evaluation_results, plot_predictions
 from modules.hyperparams.custom_classes import (SequenceStackingRegressor, RegularizedSequenceStackingRegressor,
                                                 KerasRegressor)
-from modules.hyperparams.optimisers import optimize_hyperparameters_base, optimize_hyperparameters
-from modules.hyperparams.save_and_load import save_hyperparameters, load_hyperparameters
+from modules.hyperparams.optimisers import optimize_hyperparameters
 from modules.models.build_models import (build_lstm_model, build_bidirectional_lstm_model, build_stacked_lstm_model,
                                          build_cnn_lstm_model, build_gru_model, build_final_model)
 from modules.models.ensemble import SequenceEnsemble
@@ -109,30 +108,17 @@ def main():
     model_names = ['lstm', 'bilstm', 'stacked_lstm', 'cnn_lstm', 'gru']
     gc.collect()
     # Train models concurrently
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=parallel_workers) as executor:
         trained_models = list(executor.map(
             lambda m, n: train_model(m, train_dataset, val_dataset, n),
             models, model_names
         ))
     gc.collect()
-    # Load saved hyperparameters if they exist
-    saved_params = load_hyperparameters('optimized_lstm')
 
-    if saved_params:
-        logging.info("Using saved hyperparameters")
-        best_params = saved_params
-    else:
-        # Split the data into train and validation sets for hyperparameter tuning
-        train_size = int(0.8 * len(X_train_padded))
-        X_train, X_val = X_train_padded[:train_size], X_train_padded[train_size:]
-        y_train, y_val = y_train_padded[:train_size], y_train_padded[train_size:]
-
-        # Hyperparameter tuning
-        best_params = optimize_hyperparameters_base(X_train, y_train, X_val, y_val)
-        logging.info(f"Best hyperparameters: {best_params}")
-
-        # Save the best hyperparameters
-        save_hyperparameters(best_params, 'optimized_lstm')
+    best_params = {"lstm_units": 97,
+                   "dropout_rate": 0.14648565863246926,
+                   "learning_rate": 0.0007653631599876039,
+                   "l2_reg": 0.00013107209632797685}
 
     # Build final model with best hyperparameters
     input_shape = (X_train_padded.shape[1], X_train_padded.shape[2])

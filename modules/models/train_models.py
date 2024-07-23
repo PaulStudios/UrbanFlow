@@ -1,3 +1,4 @@
+import gc
 import json
 
 import numpy as np
@@ -11,7 +12,7 @@ from tensorflow.keras.callbacks import EarlyStopping, LearningRateScheduler
 
 from modules.config import training_rounds
 from modules.models.progress import ProgressMonitor
-from modules.utilities import run_with_timeout
+from modules.utilities import run_with_timeout, logging
 
 
 def lr_schedule(epoch):
@@ -45,6 +46,8 @@ def train_model(model, train_dataset, val_dataset, model_name):
         tf.keras.Model: The trained model, or None if training fails.
     """
     # Check model output shape
+    gc.collect()
+
     for x, y in train_dataset.take(1):
         output = model(x)
         if output.shape[1:] != y.shape[1:]:
@@ -117,6 +120,7 @@ def train_stacking_model(lstm_preds, bilstm_preds, y_true):
     Returns:
         tuple: The trained meta-learner, meta features, and reshaped true values.
     """
+    gc.collect()
     X_meta, y_true_reshaped = reshape_dataset(lstm_preds, bilstm_preds, y_true)
 
     meta_learner = LinearRegression()
@@ -137,6 +141,7 @@ def train_regularized_stacking_model(lstm_preds, bilstm_preds, y_true, alpha=1.0
     Returns:
         tuple: Trained Ridge model, reshaped meta features, and reshaped true values.
     """
+    gc.collect()
     X_meta, y_true_reshaped = reshape_dataset(lstm_preds, bilstm_preds, y_true)
 
     meta_learner = Ridge(alpha=alpha)

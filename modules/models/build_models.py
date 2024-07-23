@@ -136,3 +136,7 @@ def build_final_model(best_params, input_shape):
     ])
     model.compile(optimizer=Adam(learning_rate=max(best_params['learning_rate'], 1e-5)), loss=scaled_mse)
     return model
+
+
+def build_lstm_model_custom():
+    return None
