@@ -27,7 +27,7 @@ from sklearn.svm import SVR
 from xgboost import XGBRegressor
 
 import download_data
-from modules.config import training_rounds, parallel_workers
+from modules.config import parallel_workers
 from modules.data.load_data import load_data
 from modules.data.preprocessing import prepare_data, split_data, normalize_data
 from modules.evaluation.evaluate import evaluate_models
@@ -95,7 +95,6 @@ def main():
     val_dataset = val_dataset.batch(32).prefetch(tf.data.experimental.AUTOTUNE)
 
     input_shape = (X_train_padded.shape[1], X_train_padded.shape[2])
-    print(f"Input shape: {input_shape}")
 
     lstm_model = build_lstm_model(input_shape)
     bilstm_model = build_bidirectional_lstm_model(input_shape)
@@ -128,21 +127,32 @@ def main():
     final_model = train_model(final_model, train_dataset, val_dataset, 'optimized_lstm')
 
     # Time series cross-validation
+    logging.info("Starting Cross Validation")
     tscv = TimeSeriesSplit(n_splits=5)
     cv_scores = []
-    for train_index, test_index in tscv.split(X_train_padded):
+    logging.info(f"Length of training set: {len(X_train_padded)}")
+    for fold, (train_index, test_index) in enumerate(tscv.split(X_train_padded), 1):
+        print(f"Fold {fold}/{tscv.n_splits}")
+
         X_train_cv, X_test_cv = X_train_padded[train_index], X_train_padded[test_index]
         y_train_cv, y_test_cv = y_train_padded[train_index], y_train_padded[test_index]
 
         model_cv = build_lstm_model((X_train_cv.shape[1], X_train_cv.shape[2]))
-        model_cv.fit(X_train_cv, y_train_cv, epochs=training_rounds, verbose=0)
 
+        print("Training model...")
+        history = model_cv.fit(X_train_cv, y_train_cv, epochs=10, verbose=0)
+        print(f"Training complete. Final loss: {history.history['loss'][-1]:.4f}")
+
+        print("Making predictions...")
         y_pred_cv = model_cv.predict(X_test_cv)
 
         y_test_cv_reshaped = y_test_cv.reshape(-1, y_test_cv.shape[-1])
         y_pred_cv_reshaped = y_pred_cv.reshape(-1, y_pred_cv.shape[-1])
 
-        cv_scores.append(mean_squared_error(y_test_cv_reshaped, y_pred_cv_reshaped))
+        mse = mean_squared_error(y_test_cv_reshaped, y_pred_cv_reshaped)
+        cv_scores.append(mse)
+        print(f"Fold {fold} MSE: {mse:.4f}")
+        print("--------------------")
 
     logging.info(f"Cross-validation MSE scores: {cv_scores}")
     logging.info(f"Mean CV MSE: {np.mean(cv_scores)}, Std: {np.std(cv_scores)}")
