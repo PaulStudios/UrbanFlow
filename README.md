@@ -198,17 +198,17 @@ Combines predictions of different models, giving different weights to each model
 | Regularized Stacking | 0.0113  | 0.1065  | 0.049 | 0.989    | 0.989    | 12.998%  | Excellent   |
 | Weighted Average     | 0.0011  | 0.0327  | 0.005 | 0.999    | 0.999    | 1.107%   | Excellent   |
 
-![Bar Graph](outputs/results/evaluation_results.png?raw=true)
+![Bar Graph](route_prediction_ai/outputs/results/evaluation_results.png?raw=true)
 
 ## Visual Analysis of Predictions
 
 The visual predictions demonstrate a strong alignment with the actual paths across all models, showcasing their
 effectiveness in capturing the underlying trends.
 
-![Graph 1](outputs/results/group_0_predictions.png)
-![Graph 2](outputs/results/group_1_predictions.png)
-![Graph 3](outputs/results/group_2_predictions.png)
-![Graph 4](outputs/results/group_4_predictions.png)
+![Graph 1](route_prediction_ai/outputs/results/group_0_predictions.png)
+![Graph 2](route_prediction_ai/outputs/results/group_1_predictions.png)
+![Graph 3](route_prediction_ai/outputs/results/group_2_predictions.png)
+![Graph 4](route_prediction_ai/outputs/results/group_4_predictions.png)
 
 ### Random Forest
 
