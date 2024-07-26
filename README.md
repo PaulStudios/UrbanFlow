@@ -1,249 +1,124 @@
-# UrbanFlow: Detailed Overview of All Models and Their Performance
-
-**UrbanFlow** is a smart system designed to manage traffic lights to prioritize emergency vehicles and improve overall
-traffic flow. By predicting vehicle routes using various machine learning models, the system aims to enhance urban
-traffic management. Here’s a detailed overview of all the models used in the project and their performance, with a focus
-on the best-performing ones.
-
-## Performance Metrics
-
-- **MSE (Mean Squared Error):** Measures the average squared difference between predicted and actual values. Lower is
-  better.
-- **RMSE (Root Mean Squared Error):** The square root of MSE. Lower is better.
-- **MAE (Mean Absolute Error):** The average absolute difference between predicted and actual values. Lower is better.
-- **R² (Coefficient of Determination):** Indicates how well the model explains the variance in the target variable.
-  Higher is better.
-- **EVS (Explained Variance Score):** Measures the proportion of variance explained by the model. Higher is better.
-- **MAPE (Mean Absolute Percentage Error):** The average absolute percentage difference between predicted and actual
-  values. Lower is better.
-
-### Best Performing Models
-
-#### 1. **Random Forest**
-
-Random Forest uses multiple decision trees to make predictions. Each tree gives a prediction, and the final result is a
-combination of all these predictions.
-
-- **MSE:** 0.0009
-- **RMSE:** 0.0307
-- **MAE:** 0.004
-- **R²:** 0.999
-- **EVS:** 0.999
-- **MAPE:** 0.784%
-
-**Performance:** Outstanding. This model makes almost perfect predictions.
-
-#### 2. **XGBoost**
-
-XGBoost is an advanced model that builds multiple trees sequentially, each learning from the mistakes of the previous
-ones.
-
-- **MSE:** 0.0057
-- **RMSE:** 0.0753
-- **MAE:** 0.024
-- **R²:** 0.994
-- **EVS:** 0.994
-- **MAPE:** 4.301%
-
-**Performance:** Excellent. This model is highly accurate and reliable.
-
-#### 3. **Ensemble Model**
-
-An ensemble model combines predictions from multiple models to improve accuracy. It's like getting opinions from various
-experts and combining them.
-
-- **MSE:** 0.0040
-- **RMSE:** 0.0635
-- **MAE:** 0.029
-- **R²:** 0.996
-- **EVS:** 0.996
-- **MAPE:** 4.357%
-
-**Performance:** Outstanding. This model leverages the strengths of multiple models for very high accuracy.
-
-#### 4. **GRU (Gated Recurrent Unit)**
-
-GRU is a type of neural network that is particularly good at predicting sequences, like the future path of a vehicle.
-
-- **MSE:** 0.0035
-- **RMSE:** 0.0589
-- **MAE:** 0.022
-- **R²:** 0.997
-- **EVS:** 0.997
-- **MAPE:** 5.063%
-
-**Performance:** Outstanding. This model is very good at handling sequential data.
-
-### Other Models
-
-#### 5. **CNN-LSTM**
-
-Combines Convolutional Neural Networks (CNN) and LSTMs. CNNs are great for spatial data, and LSTMs are good for time
-series data.
-
-- **MSE:** 0.0115
-- **RMSE:** 0.1075
-- **MAE:** 0.052
-- **R²:** 0.988
-- **EVS:** 0.988
-- **MAPE:** 13.788%
-
-**Performance:** Excellent. High accuracy and low error.
-
-#### 6. **Stacked LSTM**
-
-Stacked LSTMs have multiple layers of LSTM units, enhancing their ability to capture complex patterns in the data.
-
-- **MSE:** 0.9817
-- **RMSE:** 0.9908
-- **MAE:** 0.807
-- **R²:** 0.018
-- **EVS:** 0.018
-- **MAPE:** 100.345%
-
-**Performance:** Slightly better than simple LSTM but still poor.
-
-#### 7. **Optimized LSTM**
-
-An optimized version of LSTM aiming for better performance.
-
-- **MSE:** 0.99999
-- **RMSE:** 0.99999
-- **MAE:** 0.815
-- **R²:** ~0
-- **EVS:** ~0
-- **MAPE:** 99.997%
-
-**Performance:** Very poor, nearly no predictive power.
-
-#### 8. **BiLSTM**
-
-Bidirectional LSTM processes data in both forward and backward directions.
-
-- **MSE:** 0.99997
-- **RMSE:** 0.99998
-- **MAE:** 0.815
-- **R²:** ~0.00003
-- **EVS:** ~0.00003
-- **MAPE:** 99.909%
-
-**Performance:** Very poor, similar to Optimized LSTM.
-
-#### 9. **SVM (Support Vector Machine)**
-
-SVM finds the best boundary that separates different classes of data.
-
-- **MSE:** 0.0594
-- **RMSE:** 0.2436
-- **MAE:** 0.089
-- **R²:** 0.941
-- **EVS:** 0.941
-- **MAPE:** 24.444%
-
-**Performance:** Good, relatively high accuracy.
-
-#### 10. **k-NN (k-Nearest Neighbors)**
-
-k-NN predicts the output based on the closest data points.
-
-- **MSE:** 0.0505
-- **RMSE:** 0.2247
-- **MAE:** 0.139
-- **R²:** 0.949
-- **EVS:** 0.950
-- **MAPE:** 44.521%
-
-**Performance:** Decent, moderate accuracy.
-
-#### 11. **Regularized Stacking**
-
-Combines multiple models with regularization to prevent overfitting.
-
-- **MSE:** 0.0113
-- **RMSE:** 0.1065
-- **MAE:** 0.049
-- **R²:** 0.989
-- **EVS:** 0.989
-- **MAPE:** 12.998%
-
-**Performance:** Excellent, very high accuracy.
-
-#### 12. **Weighted Average**
-
-Combines predictions of different models, giving different weights to each model.
-
-- **MSE:** 0.0011
-- **RMSE:** 0.0327
-- **MAE:** 0.005
-- **R²:** 0.999
-- **EVS:** 0.999
-- **MAPE:** 1.107%
-
-**Performance:** Excellent, very high accuracy.
-
-### Performance Summary Chart
-
-| Model                | MSE     | RMSE    | MAE   | R²       | EVS      | MAPE     | Performance |
-|----------------------|---------|---------|-------|----------|----------|----------|-------------|
-| Random Forest        | 0.0009  | 0.0307  | 0.004 | 0.999    | 0.999    | 0.784%   | Outstanding |
-| XGBoost              | 0.0057  | 0.0753  | 0.024 | 0.994    | 0.994    | 4.301%   | Excellent   |
-| Ensemble             | 0.0040  | 0.0635  | 0.029 | 0.996    | 0.996    | 4.357%   | Outstanding |
-| GRU                  | 0.0035  | 0.0589  | 0.022 | 0.997    | 0.997    | 5.063%   | Outstanding |
-| CNN-LSTM             | 0.0115  | 0.1075  | 0.052 | 0.988    | 0.988    | 13.788%  | Excellent   |
-| Stacked LSTM         | 0.9817  | 0.9908  | 0.807 | 0.018    | 0.018    | 100.345% | Poor        |
-| Optimized LSTM       | 0.99999 | 0.99999 | 0.815 | ~0       | ~0       | 99.997%  | Very Poor   |
-| BiLSTM               | 0.99997 | 0.99998 | 0.815 | ~0.00003 | ~0.00003 | 99.909%  | Very Poor   |
-| SVM                  | 0.0594  | 0.2436  | 0.089 | 0.941    | 0.941    | 24.444%  | Good        |
-| k-NN                 | 0.0505  | 0.2247  | 0.139 | 0.949    | 0.950    | 44.521%  | Decent      |
-| Regularized Stacking | 0.0113  | 0.1065  | 0.049 | 0.989    | 0.989    | 12.998%  | Excellent   |
-| Weighted Average     | 0.0011  | 0.0327  | 0.005 | 0.999    | 0.999    | 1.107%   | Excellent   |
-
-![Bar Graph](route_prediction_ai/outputs/results/evaluation_results.png?raw=true)
-
-## Visual Analysis of Predictions
-
-The visual predictions demonstrate a strong alignment with the actual paths across all models, showcasing their
-effectiveness in capturing the underlying trends.
-
-![Graph 1](route_prediction_ai/outputs/results/group_0_predictions.png)
-![Graph 2](route_prediction_ai/outputs/results/group_1_predictions.png)
-![Graph 3](route_prediction_ai/outputs/results/group_2_predictions.png)
-![Graph 4](route_prediction_ai/outputs/results/group_4_predictions.png)
-
-### Random Forest
-
-- Closely follows the actual path, indicating high reliability and accurate predictions.
-- Displays the best visual alignment among all models, suggesting superior predictive capability.
-- Provides accurate predictions, closely following the actual path consistently.
-
-### XGBoost
-
-- Exhibits minor deviations but remains very close to the actual path, confirming its robustness.
-- Maintains a very close alignment, further validating its effectiveness.
-- Shows high accuracy with only minor deviations across all datasets.
-
-### Ensemble
-
-- Aligns closely with the actual path, reinforcing the accuracy of the ensemble approach.
-- Achieves excellent alignment, validating the ensemble method's effectiveness.
-- Demonstrates very close alignment with the actual path, echoing the performance of other models.
-
-## Conclusion
-
-The UrbanFlow project shows how different machine learning models can be used to predict vehicle routes and improve
-traffic management. The best-performing models, such as Random Forest, XGBoost, Ensemble, and GRU, offer high accuracy
-and reliability, making them ideal for optimizing urban traffic flow. Other models, while not as accurate, provide
-insights into different approaches to solving the problem.
+# UrbanFlow: Smart Traffic Light System with Dynamic Priority Management
+
+UrbanFlow is a smart traffic light management system designed to prioritize emergency vehicles and optimize traffic
+flow. The system uses real-time data, machine learning, and the Google Maps API to enhance urban traffic efficiency.
+
+## Table of Contents
+
+1. [Project Overview](#project-overview)
+2. [Features](#features)
+3. [System Architecture](#system-architecture)
+4. [Installation](#installation)
+5. [Usage](#usage)
+6. [Contributing](#contributing)
+7. [License](#license)
+8. [Contact](#contact)
+
+## Project Overview
+
+UrbanFlow is an innovative traffic management solution that integrates live traffic signal data and GPS information from
+emergency vehicles to dynamically adjust traffic lights. The system uses a priority algorithm to ensure emergency
+vehicles receive the necessary priority at intersections, reducing response times and improving traffic flow.
+
+The project includes a [Voluntary Data Collector](https://github.com/PaulStudios/Voluntary-Data-Collector), which allows
+users to submit their GPS data voluntarily, enriching the dataset used for traffic analysis and prediction. This
+additional data source enhances the accuracy and reliability of the UrbanFlow system by providing a broader view of
+traffic patterns.
+
+## Features
+
+- **Real-Time Traffic Data Collection**: Collects live traffic signal status and GPS data every 30 seconds.
+- **Voluntary Data Collection**: Utilizes the Voluntary Data Collector app to gather additional GPS data from users,
+  increasing the robustness of traffic predictions.
+- **Priority Management**: Assigns dynamic priority scores to vehicles based on type and proximity to intersections.
+- **Machine Learning Integration**: Predicts vehicle routes using historical and real-time data.
+- **Google Maps API**: Utilizes Maps API for accurate ETA calculations and route predictions.
+- **Traffic Signal Optimization**: Automatically updates and manages traffic signals based on processed data.
+- **User-Friendly Interface**: Mobile application for emergency vehicle drivers with real-time updates and
+  notifications.
+- **Scalable Architecture**: Supports high volumes of data with robust performance monitoring and load balancing.
+
+## System Architecture
+
+![UrbanFlow Algorithm](UrbanFlow%20Flowchart.png)
+
+The UrbanFlow system consists of several key components:
+
+1. **UrbanFlow Server**: Central hub for processing incoming data and managing traffic priorities.
+2. **API Server**: Handles GPS data collection and processing from voluntary data submissions.
+3. **Database**: Stores traffic and GPS data, along with machine learning models.
+4. **Priority Algorithm**: Calculates priority scores and schedules signal changes.
+5. **Machine Learning Model**: Predicts vehicle routes and updates models regularly.
+6. **Data Collection**: Collects GPS from users to further train Route Prediction AI.
+
+## Voluntary Data Collector
+
+The [Voluntary Data Collector](https://github.com/PaulStudios/Voluntary-Data-Collector) is an integral part of
+UrbanFlow, designed to enhance data collection by allowing users to contribute their GPS data. This app helps gather a
+diverse set of traffic data points, which are used to improve traffic predictions and system efficiency. Users can
+easily download the app, register, and start contributing data to the system.
+
+## Installation
+
+To set up the UrbanFlow project locally, follow these steps:
+
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/hilfing/urbanflow.git
+   cd urbanflow
+   ```
+
+2. **Install Dependencies**:
+   Ensure you have Python and pip installed. Then, run:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Set Up the Database** (UNDER DEVELOPMENT):
+   Initialize the database using:
+   ```bash
+   python setup_database.py
+   ```
+
+4. **Configure API Keys**:
+   Create a `.env` file in the root directory with your API keys:
+   ```plaintext
+   GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   ```
+
+5. **Run the Server**:
+   Start the server with:
+   ```bash
+   python manage.py runserver
+   ```
+
+## Usage
+
+1. **Mobile App**: Install the UrbanFlow app on emergency vehicle drivers' phones to send GPS data.
+2. **Voluntary Data Collector**: Encourage users to download and use the Voluntary Data Collector app to submit GPS data
+   voluntarily.
+3. **Web Interface**: Access the UrbanFlow web dashboard to monitor traffic and manage configurations.
+4. **Notifications**: Receive real-time notifications on traffic signal updates and priority routes.
 
 ## Contributing
-Contributions to UrbanFlow are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
-## Acknowledgments
-- This project was developed as part of the ISEF project by Indradip Paul.
-- Special thanks to my mentor for guidance and support.
+We welcome contributions to UrbanFlow! To contribute, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature/your-feature-name`.
+3. Make your changes and commit them: `git commit -m 'Add some feature'`.
+4. Push to the branch: `git push origin feature/your-feature-name`.
+5. Submit a pull request.
+
+Please ensure your code adheres to the project's coding standards and includes appropriate tests.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
 ## Contact
-For questions or support, please contact [me](mailto:indradip.paul@outlook.com).
+
+For any questions or suggestions, feel free to reach out:
+
+- **Email**: [indradip.paul@outlook.com](mailto:indradip.paul@outlook.com)
+- **GitHub**: [HilFing](https://github.com/hilfing)
