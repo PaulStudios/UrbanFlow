@@ -234,21 +234,3 @@ The UrbanFlow project shows how different machine learning models can be used to
 traffic management. The best-performing models, such as Random Forest, XGBoost, Ensemble, and GRU, offer high accuracy
 and reliability, making them ideal for optimizing urban traffic flow. Other models, while not as accurate, provide
 insights into different approaches to solving the problem.
-
-## Contributing
-
-Contributions to UrbanFlow are welcome! For major changes, please open an issue first to discuss what you would like to
-change.
-
-## Acknowledgments
-
-- This project was developed as part of the ISEF project by Indradip Paul.
-- Special thanks to my mentor for guidance and support.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
-
-## Contact
-
-For questions or support, please contact [me](mailto:indradip.paul@outlook.com).
