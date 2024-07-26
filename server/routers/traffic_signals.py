@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .. import models, schemas, database
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 import datetime
 import cachetools
 import threading
@@ -67,6 +67,24 @@ def create_traffic_signal(signal: schemas.TrafficSignalCreate, db: Session = Dep
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"An error occurred while creating the traffic signal: {str(e)}")
+
+
+@router.get("/create", response_class=HTMLResponse)
+async def create_signal_form():
+    return """
+    <html>
+        <body>
+            <h2>Create New Traffic Signal</h2>
+            <form method="post">
+                <input type="text" name="signal_id" placeholder="Signal ID" required><br>
+                <input type="text" name="status" placeholder="Status" required><br>
+                <input type="number" step="0.000001" name="longitude" placeholder="Longitude" required><br>
+                <input type="number" step="0.000001" name="latitude" placeholder="Latitude" required><br>
+                <input type="submit" value="Create Signal">
+            </form>
+        </body>
+    </html>
+    """
 
 
 @router.put("/{signal_id}")
