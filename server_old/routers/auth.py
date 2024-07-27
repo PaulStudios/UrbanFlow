@@ -3,11 +3,11 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from .. import models, database, schemas
 from ..database import get_db
-from ..main import templates
 from ..utils.auth import create_access_token, get_password_hash, create_api_key, get_current_user, authenticate_user
 
 router = APIRouter(
@@ -15,6 +15,7 @@ router = APIRouter(
     tags=["Authentication"],
 )
 
+templates = Jinja2Templates(directory="server_old/templates")
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_form(request: Request):

@@ -2,12 +2,13 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
+from fastapi import status
 from sqlalchemy.orm import Session
-from starlette import status
 from typing import Union
 
 from .. import models, schemas, database
-from ..main import templates
+
 import datetime
 import cachetools
 import threading
@@ -20,6 +21,8 @@ router = APIRouter(
     tags=["Traffic Signals"],
 )
 
+templates = Jinja2Templates(directory="server_old/templates")
+
 # Initialize caches
 all_signal_ids_cache = cachetools.Cache(maxsize=1000)
 updated_signal_ids_cache = cachetools.TTLCache(maxsize=1000, ttl=30)
@@ -28,13 +31,22 @@ updated_signal_ids_cache = cachetools.TTLCache(maxsize=1000, ttl=30)
 all_cache_lock = threading.Lock()
 updated_cache_lock = threading.Lock()
 
+
 def get_current_user_or_api_key(
-    token: str = Depends(oauth2_scheme),
-    api_key: str = Depends(get_current_user_from_api_key),
-    db: Session = Depends(database.get_db)
+        request: Request,
+        token: str = Depends(oauth2_scheme),
+        api_key: str = Depends(get_current_user_from_api_key),
+        db: Session = Depends(database.get_db)
 ):
-    if api_key:
-        return api_key
+    # First, try to get the user from the session
+    try:
+        return get_current_user(request, db)
+    except HTTPException:
+        # If session auth fails, try API key auth
+        if api_key:
+            return api_key
+
+    # If both fail, raise an authentication error
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid authentication credentials",
@@ -101,6 +113,7 @@ def create_traffic_signal(
 
 @router.get("/list", response_class=JSONResponse)
 def get_all_signals(
+    request: Request,
     db: Session = Depends(database.get_db),
     current_user: Union[models.User, None] = Depends(get_current_user_or_api_key)
 ):

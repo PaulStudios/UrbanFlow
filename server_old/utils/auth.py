@@ -2,12 +2,12 @@ import os
 
 import jwt
 from dotenv import load_dotenv
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer, APIKeyHeader
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from server.models import User, APIKey
-from server.database import SessionLocal
+from server_old.models import User, APIKey
+from server_old.database import SessionLocal
 from sqlalchemy.orm import Session
 
 load_dotenv()
@@ -47,12 +47,15 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(SessionLocal)):
+def get_current_user(request: Request, db: Session = Depends(SessionLocal)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    token = request.session.get("token")
+    if not token:
+        raise credentials_exception
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
