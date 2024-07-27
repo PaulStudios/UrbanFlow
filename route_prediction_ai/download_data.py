@@ -183,7 +183,7 @@ def filter_standing_still(df, threshold=5):
         filtered_df.drop(['next_latitude', 'next_longitude', 'validity'], axis=1, inplace=True)
 
         logging.info("Data filtered successfully")
-        logging.info(f"Rows before filtering: {len(df)}, after filtering: {len(filtered_df)}")
+        logging.info(f"Rows after filtering: {len(filtered_df)}")
 
         return filtered_df
 
@@ -202,6 +202,7 @@ def clean_data(df):
     Returns:
         pd.DataFrame: The cleaned DataFrame.
     """
+    logging.info(f"Rows before filtering: {len(df)}")
     df.dropna(inplace=True)  # Remove rows with missing values
     df.drop("data_id", axis="columns", inplace=True)
     df.drop("id", axis="columns", inplace=True)
@@ -253,7 +254,7 @@ def run():
 
     df = clean_data(df)
 
-    df.to_csv('final_data.csv', index=False)
+    df.to_csv('route_prediction_ai/final_data.csv', index=False)
     logging.info("Data saved to final_data.csv")
 
 

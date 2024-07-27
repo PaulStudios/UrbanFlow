@@ -61,10 +61,10 @@ def main():
 
     # Create the required output directories
     logging.info("Creating output directories")
-    create_directory("outputs/train_history")
-    create_directory("outputs/models")
-    create_directory("outputs/results")
-    create_directory("outputs/hyperparameters")
+    create_directory("route_prediction_ai/outputs/train_history")
+    create_directory("route_prediction_ai/outputs/models")
+    create_directory("route_prediction_ai/outputs/results")
+    create_directory("route_prediction_ai/outputs/hyperparameters")
     logging.info("Output directories created successfully")
 
     # Download training data
@@ -434,10 +434,10 @@ def main():
     for model, name in zip(models, model_names):  # Save only the base models
         if isinstance(model, tf.keras.Model):
             logging.info(f"Saving {name} as Keras model")
-            model.save(f'outputs/models/final_{name}_model.keras')
+            model.save(f'route_prediction_ai/outputs/models/final_{name}_model.keras')
         else:
             logging.info(f"Saving {name} using joblib")
-            joblib.dump(model, f'outputs/models/final_{name}_model.joblib')
+            joblib.dump(model, f'route_prediction_ai/outputs/models/final_{name}_model.joblib')
     logging.info("All models saved")
 
     logging.info("Training and evaluation complete.")

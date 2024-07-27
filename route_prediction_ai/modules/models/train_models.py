@@ -72,7 +72,7 @@ def train_model(model, train_dataset, val_dataset, model_name):
         history = run_with_timeout(train_with_timeout, timeout_duration=7200)  # 2 hour timeout
 
         # Save training history to a JSON file
-        with open(f'outputs/train_history/{model_name}_history.json', 'w') as f:
+        with open(f'route_prediction_ai/outputs/train_history/{model_name}_history.json', 'w') as f:
             json.dump(history.history, f)
 
         return model

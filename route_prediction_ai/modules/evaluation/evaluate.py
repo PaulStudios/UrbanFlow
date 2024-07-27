@@ -151,7 +151,7 @@ def evaluate_models(y_true, predictions, model_names):
         logging.info(f"  EVS: {evs:.4f}")
         logging.info(f"  MAPE: {mape:.4f}%")
 
-    with open('outputs/results/evaluation_results.json', 'w') as f:
+    with open('route_prediction_ai/outputs/results/evaluation_results.json', 'w') as f:
         json.dump(results, f)
 
     return results

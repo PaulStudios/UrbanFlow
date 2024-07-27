@@ -14,7 +14,7 @@ def save_hyperparameters(params, model_name):
     Returns:
         None
     """
-    filename = f'outputs/hyperparameters/best_hyperparameters_{model_name}.json'
+    filename = f'route_prediction_ai/outputs/hyperparameters/best_hyperparameters_{model_name}.json'
     with open(filename, 'w') as f:
         json.dump(params, f)
     logging.info(f"Best hyperparameters for {model_name} saved to {filename}")
@@ -30,7 +30,7 @@ def load_hyperparameters(model_name):
     Returns:
         dict or None: Loaded hyperparameters if the file exists, None otherwise.
     """
-    filename = f'outputs/hyperparameters/best_hyperparameters_{model_name}.json'
+    filename = f'route_prediction_ai/outputs/hyperparameters/best_hyperparameters_{model_name}.json'
     try:
         with open(filename, 'r') as f:
             params = json.load(f)

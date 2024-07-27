@@ -34,7 +34,7 @@ def plot_evaluation_results(results):
     # Add suptitle after adjusting the layout
     fig.suptitle('Model Evaluation Results', fontsize=16, y=0.98)
 
-    plt.savefig('outputs/results/evaluation_results.png')
+    plt.savefig('route_prediction_ai/outputs/results/evaluation_results.png')
     plt.show()
 
 
@@ -103,6 +103,6 @@ def plot_predictions(group_index, actual, lstm, bilstm, stacked_lstm, cnn_lstm, 
     plt.title(f'Vehicle Route Prediction - Group {group_index}')
     plt.legend(loc='best')
     plt.grid(True)
-    plt.savefig(f'outputs/results/group_{group_index}_predictions.png')
+    plt.savefig(f'route_prediction_ai/outputs/results/group_{group_index}_predictions.png')
     plt.show()
     logging.info(f"Prediction plot for group {group_index} complete.")
