@@ -1,14 +1,19 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Form, Request
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
+from starlette import status
+from typing import Union
+
 from .. import models, schemas, database
-from fastapi.responses import JSONResponse, HTMLResponse
+from ..main import templates
 import datetime
 import cachetools
 import threading
 import time
-from ..utils.auth import verify_token, oauth2_scheme
+
+from ..utils.auth import get_current_user, get_current_user_from_api_key, oauth2_scheme
 
 router = APIRouter(
     prefix="/traffic-signals",
@@ -22,6 +27,19 @@ updated_signal_ids_cache = cachetools.TTLCache(maxsize=1000, ttl=30)
 # Locks for thread safety
 all_cache_lock = threading.Lock()
 updated_cache_lock = threading.Lock()
+
+def get_current_user_or_api_key(
+    token: str = Depends(oauth2_scheme),
+    api_key: str = Depends(get_current_user_from_api_key),
+    db: Session = Depends(database.get_db)
+):
+    if api_key:
+        return api_key
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid authentication credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 
 def update_all_signal_ids_cache():
@@ -50,11 +68,23 @@ def get_db():
         db.close()
 
 
+@router.get("/create", response_class=HTMLResponse)
+async def create_signal_form(request: Request, current_user: models.User = Depends(get_current_user)):
+    return templates.TemplateResponse("create_signal.html", {"request": request, "current_user": current_user})
+
 @router.post("/create")
-def create_traffic_signal(signal: schemas.TrafficSignalCreate, db: Session = Depends(get_db),
-                          token: str = Depends(oauth2_scheme)):
-    verify_token(token)
+def create_traffic_signal(
+    request: Request,
+    longitude: float = Form(...),
+    latitude: float = Form(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
     try:
+        signal = schemas.TrafficSignalCreate(
+            longitude=longitude,
+            latitude=latitude
+        )
         db_signal = models.TrafficSignal(**signal.dict())
         db.add(db_signal)
         db.commit()
@@ -63,34 +93,53 @@ def create_traffic_signal(signal: schemas.TrafficSignalCreate, db: Session = Dep
             all_signal_ids_cache[signal.signal_id] = signal.signal_id
         with updated_cache_lock:
             updated_signal_ids_cache[signal.signal_id] = signal.signal_id
-        return db_signal
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"An error occurred while creating the traffic signal: {str(e)}")
 
 
-@router.get("/create", response_class=HTMLResponse)
-async def create_signal_form():
-    return """
-    <html>
-        <body>
-            <h2>Create New Traffic Signal</h2>
-            <form method="post">
-                <input type="text" name="signal_id" placeholder="Signal ID" required><br>
-                <input type="text" name="status" placeholder="Status" required><br>
-                <input type="number" step="0.000001" name="longitude" placeholder="Longitude" required><br>
-                <input type="number" step="0.000001" name="latitude" placeholder="Latitude" required><br>
-                <input type="submit" value="Create Signal">
-            </form>
-        </body>
-    </html>
-    """
-
+@router.get("/list", response_class=JSONResponse)
+def get_all_signals(
+    db: Session = Depends(database.get_db),
+    current_user: Union[models.User, None] = Depends(get_current_user_or_api_key)
+):
+    signals = []
+    try:
+        with updated_cache_lock:
+            updated_ids = list(updated_signal_ids_cache.keys())
+        # Load updated signals from the database
+        if updated_ids:
+            signals += db.query(models.TrafficSignal).filter(models.TrafficSignal.signal_id.in_(updated_ids)).all()
+        # Load remaining signals from the cache
+        with all_cache_lock:
+            for signal_id in all_signal_ids_cache:
+                if signal_id not in updated_ids:
+                    db_signal = db.query(models.TrafficSignal).filter(
+                        models.TrafficSignal.signal_id == signal_id).first()
+                    if db_signal:
+                        signals.append(db_signal)
+        return {
+            "signals": [
+                {
+                    "signal_id": signal.signal_id,
+                    "status": signal.status,
+                    "longitude": signal.longitude,
+                    "latitude": signal.latitude,
+                }
+                for signal in signals
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred while retrieving the signals: {str(e)}")
 
 @router.put("/{signal_id}")
-def update_traffic_signal(signal_id: str, status: str, db: Session = Depends(get_db),
-                          token: str = Depends(oauth2_scheme)):
-    verify_token(token)
+def update_traffic_signal(
+    signal_id: str,
+    status: str,
+    db: Session = Depends(database.get_db),
+    current_user: Union[models.User, None] = Depends(get_current_user_or_api_key)
+):
     try:
         db_signal = db.query(models.TrafficSignal).filter(models.TrafficSignal.signal_id == signal_id).first()
         if db_signal is None:
@@ -107,16 +156,34 @@ def update_traffic_signal(signal_id: str, status: str, db: Session = Depends(get
         raise HTTPException(status_code=500, detail=f"An error occurred while updating the traffic signal: {str(e)}")
 
 
-@router.get("/", response_class=JSONResponse)
-def get_all_signals(db: Session = Depends(get_db)):
+@router.post("/api/create")
+def create_traffic_signal_api(
+    signal: schemas.TrafficSignalCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user_from_api_key)
+):
+    try:
+        db_signal = models.TrafficSignal(**signal.dict())
+        db.add(db_signal)
+        db.commit()
+        db.refresh(db_signal)
+        with all_cache_lock:
+            all_signal_ids_cache[signal.signal_id] = signal.signal_id
+        with updated_cache_lock:
+            updated_signal_ids_cache[signal.signal_id] = signal.signal_id
+        return db_signal
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"An error occurred while creating the traffic signal: {str(e)}")
+
+@router.get("/api/list")
+def list_traffic_signals_api(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user_from_api_key)):
     signals = []
     try:
         with updated_cache_lock:
             updated_ids = list(updated_signal_ids_cache.keys())
-        # Load updated signals from the database
         if updated_ids:
             signals += db.query(models.TrafficSignal).filter(models.TrafficSignal.signal_id.in_(updated_ids)).all()
-        # Load remaining signals from the cache
         with all_cache_lock:
             for signal_id in all_signal_ids_cache:
                 if signal_id not in updated_ids:

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Register</h2>
+<form id="registerForm" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <input type="submit" value="Register">
+</form>
+
+<script>
+$(document).ready(function() {
+    $("#registerForm").validate({
+        rules: {
+            password: {
+                minlength: 8
+            }
+        },
+        messages: {
+            password: {
+                minlength: "Password must be at least 8 characters long"
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
