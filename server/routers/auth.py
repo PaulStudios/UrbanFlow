@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from .. import models, database, schemas
+from ..database import get_db
 from ..main import templates
 from ..utils.auth import create_access_token, get_password_hash, create_api_key, get_current_user, authenticate_user
 
@@ -13,14 +14,6 @@ router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
-
-
-def get_db():
-    db = database.SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.get("/login", response_class=HTMLResponse)
@@ -51,8 +44,16 @@ async def register_form(request: Request):
 
 
 @router.post("/register")
-async def register_user(request: Request, username: str = Form(...), password: str = Form(...),
-                        db: Session = Depends(get_db)):
+async def register_user(
+        request: Request,
+        username: str = Form(...),
+        password: str = Form(...),
+        db: Session = Depends(get_db)
+):
+    client_host = request.client.host
+    if client_host not in ["127.0.0.1", "::1"]:
+        raise HTTPException(status_code=403, detail="Registration is only allowed from localhost")
+
     db_user = db.query(models.User).filter(models.User.username == username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")

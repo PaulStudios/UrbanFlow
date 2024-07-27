@@ -7,7 +7,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from server.database import Base as db_Base
-from server.models import User, TrafficSignal
+from server.models import User, TrafficSignal, APIKey
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
