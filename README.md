@@ -74,22 +74,26 @@ To set up the UrbanFlow project locally, follow these steps:
    pip install -r requirements.txt
    ```
 
-3. **Set Up the Database** (UNDER DEVELOPMENT):
-   Initialize the database using:
-   ```bash
-   python setup_database.py
-   ```
-
-4. **Configure API Keys**:
+3. **Configure Private Keys**:
    Create a `.env` file in the root directory with your API keys:
    ```plaintext
-   GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   DATABASE_URL_ASYNC=postgresql+asyncpg://user:password@host/dbname
+   DATABASE_URL=postgresql://user:password@host/dbname
+   GOOGLE_MAPS_API_KEY=your_google_maps_apikey
+   SECRET_KEY=secret_key_used_for_hashing
+   ALGORITHM=HS256
+   ```
+
+4. **Set Up the Database** (UNDER DEVELOPMENT):
+   Initialize the database using:
+   ```bash
+   alembic upgrade head
    ```
 
 5. **Run the Server**:
    Start the server with:
    ```bash
-   python manage.py runserver
+   uvicorn server.main:app --reload 
    ```
 
 ## Usage
