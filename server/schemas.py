@@ -6,7 +6,6 @@ class TrafficSignalBase(BaseModel):
     status: str
     latitude: float
     longitude: float
-    time_from_last_change: int
 
 
 class TrafficSignalCreate(TrafficSignalBase):
@@ -15,7 +14,6 @@ class TrafficSignalCreate(TrafficSignalBase):
 
 class TrafficSignalUpdate(BaseModel):
     status: str
-    time_from_last_change: int
 
 
 class TrafficSignal(TrafficSignalBase):

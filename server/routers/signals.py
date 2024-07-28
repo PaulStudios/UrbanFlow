@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import UUID4
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from server import models, schemas, database, cache
@@ -18,7 +19,7 @@ router = APIRouter(
 )
 
 
-@router.post("/create", response_model=TrafficSignal)
+@router.post("/create", response_model=schemas.TrafficSignal)
 async def create_signal(
         signal: schemas.TrafficSignalCreate,
         db: AsyncSession = Depends(database.get_db),
@@ -26,8 +27,17 @@ async def create_signal(
 ):
     db_signal = models.TrafficSignal(**signal.dict())
     db.add(db_signal)
-    await db.commit()
-    await db.refresh(db_signal)
+
+    try:
+        await db.commit()
+        await db.refresh(db_signal)
+    except IntegrityError:
+        await db.rollback()  # Rollback the transaction in case of an error
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A traffic signal with this latitude and longitude already exists."
+        )
+
     return db_signal
 
 
@@ -53,7 +63,7 @@ async def update_signal(
 @router.get("/", response_model=List[schemas.TrafficSignal])
 async def read_signals(
         db: AsyncSession = Depends(database.get_db),
-        current_user: auth.models.User = Depends(auth.get_current_user)
+        api_key: auth.models.APIKey = Depends(auth.get_api_key)
 ):
     updated_ids = cache.get_updated_signal_ids()
 

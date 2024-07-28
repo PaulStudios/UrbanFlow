@@ -1,9 +1,11 @@
 from pydantic import BaseModel, UUID4
 from datetime import datetime
 
+
 class UserCreate(BaseModel):
     username: str
     password: str
+
 
 class User(BaseModel):
     id: UUID4
@@ -13,16 +15,29 @@ class User(BaseModel):
     class Config:
         orm_mode = True
 
+
+class UserResponse(BaseModel):
+    id: UUID4
+    username: str
+
+    class Config:
+        orm_mode = True
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str
+    id: UUID4
+
 
 class TokenData(BaseModel):
     username: str | None = None
 
+
 class APIKeyCreate(BaseModel):
     user_id: UUID4
     expires_at: datetime
+
 
 class APIKey(BaseModel):
     id: UUID4

@@ -1,4 +1,6 @@
 import asyncio
+import logging
+
 from cachetools import TTLCache
 from threading import Lock
 
@@ -22,7 +24,8 @@ async def update_all_signal_ids_cache(db):
             with all_cache_lock:
                 all_signal_ids_cache.clear()
                 all_signal_ids_cache.update({signal_id: signal_id for signal_id in signal_ids})
-
+        logging.info("Updated all signals cache")
+        print("Updated all signals cache")
         await asyncio.sleep(30)
 
 

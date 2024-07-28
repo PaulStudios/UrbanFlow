@@ -1,6 +1,6 @@
-from sqlalchemy import Column, String, Float, Integer, DateTime, func
+from sqlalchemy import Column, String, Float, Integer, DateTime, func, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
-from .database import Base
+from server.database import Base
 import uuid
 
 class TrafficSignal(Base):
@@ -10,5 +10,9 @@ class TrafficSignal(Base):
     status = Column(String, index=True)
     latitude = Column(Float)
     longitude = Column(Float)
-    time_from_last_change = Column(Integer)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    # Add a unique constraint on the combination of latitude and longitude
+    __table_args__ = (
+        UniqueConstraint('latitude', 'longitude', name='uix_latitude_longitude'),
+    )

@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 from server import models, schemas, database, cache
 from server.auth import auth
 from typing import List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(
@@ -13,11 +13,23 @@ router = APIRouter(
     tags=["Authentication"],
 )
 
+
 @router.post("/register", response_model=auth.schemas.User)
 async def register_user(
         user: auth.schemas.UserCreate,
         db: AsyncSession = Depends(database.get_db)
 ):
+    # Check if the user already exists
+    result = await db.execute(select(auth.models.User).filter_by(username=user.username))
+    existing_user = result.scalars().first()
+
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already exists"
+        )
+
+    # Create a new user if not exists
     db_user = auth.models.User(username=user.username,
                                hashed_password=auth.jwt_handler.get_password_hash(user.password))
     db.add(db_user)
@@ -42,7 +54,7 @@ async def login_for_access_token(
     access_token = auth.jwt_handler.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "id": user.id}
 
 
 @router.post("/api-key", response_model=auth.schemas.APIKey)
@@ -51,5 +63,5 @@ async def create_api_key(
         db: AsyncSession = Depends(database.get_db),
         current_user: auth.models.User = Depends(auth.get_current_user)
 ):
-    db_api_key = await auth.create_api_key(db, api_key.user_id, api_key.expires_at - datetime.utcnow())
+    db_api_key = await auth.create_api_key(db, api_key.user_id, api_key.expires_at - datetime.now(timezone.utc))
     return db_api_key

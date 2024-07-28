@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, APIKeyHeader
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from jose import JWTError, jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 from server.auth import models, schemas, jwt_handler
 from server.database import get_db
@@ -40,7 +40,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
 
 async def create_api_key(db: AsyncSession, user_id: uuid4, expires_delta: timedelta):
     api_key = str(uuid4())
-    expires_at = datetime.utcnow() + expires_delta
+    expires_at = datetime.now(timezone.utc) + expires_delta
     db_api_key = models.APIKey(user_id=user_id, api_key=api_key, expires_at=expires_at)
     db.add(db_api_key)
     await db.commit()
@@ -55,7 +55,8 @@ async def get_api_key(
         select(models.APIKey).filter(models.APIKey.api_key == api_key)
     )
     db_api_key = db_api_key.scalar_one_or_none()
-    if not db_api_key or db_api_key.expires_at < datetime.utcnow():
+
+    if not db_api_key or db_api_key.expires_at < datetime.now(timezone.utc):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired API key"
