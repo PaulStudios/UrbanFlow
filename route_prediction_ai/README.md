@@ -24,26 +24,12 @@ on the best-performing ones.
 Random Forest uses multiple decision trees to make predictions. Each tree gives a prediction, and the final result is a
 combination of all these predictions.
 
-- **MSE:** 0.0009
-- **RMSE:** 0.0307
-- **MAE:** 0.004
-- **R²:** 0.999
-- **EVS:** 0.999
-- **MAPE:** 0.784%
-
 **Performance:** Outstanding. This model makes almost perfect predictions.
 
 #### 2. **XGBoost**
 
 XGBoost is an advanced model that builds multiple trees sequentially, each learning from the mistakes of the previous
 ones.
-
-- **MSE:** 0.0057
-- **RMSE:** 0.0753
-- **MAE:** 0.024
-- **R²:** 0.994
-- **EVS:** 0.994
-- **MAPE:** 4.301%
 
 **Performance:** Excellent. This model is highly accurate and reliable.
 
@@ -52,25 +38,11 @@ ones.
 An ensemble model combines predictions from multiple models to improve accuracy. It's like getting opinions from various
 experts and combining them.
 
-- **MSE:** 0.0040
-- **RMSE:** 0.0635
-- **MAE:** 0.029
-- **R²:** 0.996
-- **EVS:** 0.996
-- **MAPE:** 4.357%
-
 **Performance:** Outstanding. This model leverages the strengths of multiple models for very high accuracy.
 
 #### 4. **GRU (Gated Recurrent Unit)**
 
 GRU is a type of neural network that is particularly good at predicting sequences, like the future path of a vehicle.
-
-- **MSE:** 0.0035
-- **RMSE:** 0.0589
-- **MAE:** 0.022
-- **R²:** 0.997
-- **EVS:** 0.997
-- **MAPE:** 5.063%
 
 **Performance:** Outstanding. This model is very good at handling sequential data.
 
@@ -81,25 +53,11 @@ GRU is a type of neural network that is particularly good at predicting sequence
 Combines Convolutional Neural Networks (CNN) and LSTMs. CNNs are great for spatial data, and LSTMs are good for time
 series data.
 
-- **MSE:** 0.0115
-- **RMSE:** 0.1075
-- **MAE:** 0.052
-- **R²:** 0.988
-- **EVS:** 0.988
-- **MAPE:** 13.788%
-
 **Performance:** Excellent. High accuracy and low error.
 
 #### 6. **Stacked LSTM**
 
 Stacked LSTMs have multiple layers of LSTM units, enhancing their ability to capture complex patterns in the data.
-
-- **MSE:** 0.9817
-- **RMSE:** 0.9908
-- **MAE:** 0.807
-- **R²:** 0.018
-- **EVS:** 0.018
-- **MAPE:** 100.345%
 
 **Performance:** Slightly better than simple LSTM but still poor.
 
@@ -107,25 +65,11 @@ Stacked LSTMs have multiple layers of LSTM units, enhancing their ability to cap
 
 An optimized version of LSTM aiming for better performance.
 
-- **MSE:** 0.99999
-- **RMSE:** 0.99999
-- **MAE:** 0.815
-- **R²:** ~0
-- **EVS:** ~0
-- **MAPE:** 99.997%
-
 **Performance:** Very poor, nearly no predictive power.
 
 #### 8. **BiLSTM**
 
 Bidirectional LSTM processes data in both forward and backward directions.
-
-- **MSE:** 0.99997
-- **RMSE:** 0.99998
-- **MAE:** 0.815
-- **R²:** ~0.00003
-- **EVS:** ~0.00003
-- **MAPE:** 99.909%
 
 **Performance:** Very poor, similar to Optimized LSTM.
 
@@ -133,25 +77,11 @@ Bidirectional LSTM processes data in both forward and backward directions.
 
 SVM finds the best boundary that separates different classes of data.
 
-- **MSE:** 0.0594
-- **RMSE:** 0.2436
-- **MAE:** 0.089
-- **R²:** 0.941
-- **EVS:** 0.941
-- **MAPE:** 24.444%
-
 **Performance:** Good, relatively high accuracy.
 
 #### 10. **k-NN (k-Nearest Neighbors)**
 
 k-NN predicts the output based on the closest data points.
-
-- **MSE:** 0.0505
-- **RMSE:** 0.2247
-- **MAE:** 0.139
-- **R²:** 0.949
-- **EVS:** 0.950
-- **MAPE:** 44.521%
 
 **Performance:** Decent, moderate accuracy.
 
@@ -159,25 +89,11 @@ k-NN predicts the output based on the closest data points.
 
 Combines multiple models with regularization to prevent overfitting.
 
-- **MSE:** 0.0113
-- **RMSE:** 0.1065
-- **MAE:** 0.049
-- **R²:** 0.989
-- **EVS:** 0.989
-- **MAPE:** 12.998%
-
 **Performance:** Excellent, very high accuracy.
 
 #### 12. **Weighted Average**
 
 Combines predictions of different models, giving different weights to each model.
-
-- **MSE:** 0.0011
-- **RMSE:** 0.0327
-- **MAE:** 0.005
-- **R²:** 0.999
-- **EVS:** 0.999
-- **MAPE:** 1.107%
 
 **Performance:** Excellent, very high accuracy.
 
