@@ -74,7 +74,7 @@ def main():
 
     # Load and prepare the data
     logging.info("Loading and preparing data")
-    data = load_data("final_data.csv")
+    data = load_data("route_prediction_ai/final_data.csv")
     logging.info(f"Data loaded. Shape: {data.shape}")
     grouped = data.groupby('upload_id')
     logging.info(f"Data grouped by upload_id. Number of groups: {len(grouped)}")
