@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -16,9 +16,18 @@ router = APIRouter(
 
 @router.post("/register", response_model=auth.schemas.User)
 async def register_user(
+        request: Request,
         user: auth.schemas.UserCreate,
         db: AsyncSession = Depends(database.get_db)
 ):
+    # Check if the request is coming from localhost
+    client_host = request.client.host
+    if client_host not in ['127.0.0.1', 'localhost', '::1']:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access Restricted"
+        )
+
     # Check if the user already exists
     result = await db.execute(select(auth.models.User).filter_by(username=user.username))
     existing_user = result.scalars().first()
