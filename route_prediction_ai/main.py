@@ -30,22 +30,21 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.svm import SVR
 from xgboost import XGBRegressor
 
-import download_data
-from modules.config import parallel_workers
-from modules.data.load_data import load_data
-from modules.data.preprocessing import prepare_data, split_data, normalize_data
-from modules.evaluation.evaluate import evaluate_models
-from modules.evaluation.plotting import plot_evaluation_results, plot_predictions
-from modules.hyperparams.custom_classes import (SequenceStackingRegressor, RegularizedSequenceStackingRegressor,
+from .modules.config import parallel_workers
+from .modules.data.load_data import load_data
+from .modules.data.preprocessing import prepare_data, split_data, normalize_data
+from .modules.evaluation.evaluate import evaluate_models
+from .modules.evaluation.plotting import plot_evaluation_results, plot_predictions
+from .modules.hyperparams.custom_classes import (SequenceStackingRegressor, RegularizedSequenceStackingRegressor,
                                                 KerasRegressor)
-from modules.hyperparams.optimisers import optimize_hyperparameters
-from modules.models.build_models import (build_lstm_model, build_bidirectional_lstm_model, build_stacked_lstm_model,
+from .modules.hyperparams.optimisers import optimize_hyperparameters
+from .modules.models.build_models import (build_lstm_model, build_bidirectional_lstm_model, build_stacked_lstm_model,
                                          build_cnn_lstm_model, build_gru_model, build_final_model)
-from modules.models.ensemble import SequenceEnsemble
-from modules.models.predict import weighted_average_predictions, predict_with_proper_shape
-from modules.models.train_models import train_model
-from modules.utilities import create_directory
-from modules.utilities import logging
+from .modules.models.ensemble import SequenceEnsemble
+from .modules.models.predict import weighted_average_predictions, predict_with_proper_shape
+from .modules.models.train_models import train_model
+from .modules.utilities import create_directory
+from .modules.utilities import logging
 
 # Enable GPU memory growth
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -66,11 +65,6 @@ def main():
     create_directory("route_prediction_ai/outputs/results")
     create_directory("route_prediction_ai/outputs/hyperparameters")
     logging.info("Output directories created successfully")
-
-    # Download training data
-    logging.info("Downloading training data")
-    download_data.run()
-    logging.info("Training data downloaded successfully")
 
     # Load and prepare the data
     logging.info("Loading and preparing data")
@@ -232,6 +226,9 @@ def main():
         ('knn', knn_model),
     ]
     gc.collect()
+
+    logging.info(f"X_train shape: {X_train_reshaped.shape}")
+    logging.info(f"y_train shape: {y_train_reshaped.shape}")
 
     # Optimize hyperparameters
     logging.info("Starting hyperparameter optimization")

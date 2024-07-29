@@ -4,6 +4,8 @@ import pandas as pd
 import requests
 from haversine import haversine, Unit
 
+from .modules.downloader import reset_db
+
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -256,6 +258,8 @@ def run():
 
     df.to_csv('route_prediction_ai/final_data.csv', index=False)
     logging.info("Data saved to final_data.csv")
+
+    reset_db.run("route_prediction_ai/final_data.csv")
 
 
 if __name__ == "__main__":
