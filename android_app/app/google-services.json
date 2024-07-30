@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "644092767203",
+    "project_id": "urbanflow-933f7",
+    "storage_bucket": "urbanflow-933f7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:644092767203:android:5af453468c704f17b38ed6",
+        "android_client_info": {
+          "package_name": "org.paulstudios.urbanflow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "644092767203-dsnk0q5ulngoplds90k4c752oog2e1rp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.paulstudios.urbanflow",
+            "certificate_hash": "90bb4e4f83c14f3a5e9163d9d12df9962cf0c292"
+          }
+        },
+        {
+          "client_id": "644092767203-s9e7su6v9053j9g0d53p15uaf4770snp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.paulstudios.urbanflow",
+            "certificate_hash": "21ee23ffcca59e361c6eb8e2b9024258101f3680"
+          }
+        },
+        {
+          "client_id": "644092767203-0i7u28tvodt7av97ds1sadehrgtl12sd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJICp_Q-EY9D88_aWNkf7MN8gSmV45BuA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "644092767203-0i7u28tvodt7av97ds1sadehrgtl12sd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

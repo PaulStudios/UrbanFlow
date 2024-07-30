@@ -82,6 +82,8 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.junit)
+    implementation(libs.androidx.monitor)
+    implementation(libs.androidx.junit.ktx)
     androidTestImplementation(libs.junit)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
@@ -114,5 +116,9 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
 
+    // Markwon dependencies
+    implementation(libs.core)
+    implementation(libs.ext.strikethrough)
+    implementation(libs.ext.tables)
 
 }

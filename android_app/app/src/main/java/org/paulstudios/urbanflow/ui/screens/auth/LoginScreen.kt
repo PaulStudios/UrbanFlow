@@ -1,7 +1,7 @@
 package org.paulstudios.urbanflow.ui.screens.auth
 
-import org.paulstudios.urbanflow.MainActivity
 import android.app.Activity
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import org.paulstudios.datasurvey.ui.screens.auth.components.AuthScreen
+import org.paulstudios.urbanflow.MainActivity
 import org.paulstudios.urbanflow.data.models.Screen
 import org.paulstudios.urbanflow.viewmodels.AuthState
 import org.paulstudios.urbanflow.viewmodels.AuthViewModel
@@ -28,6 +29,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         buttonText = "Login",
         onSubmit = {
             viewModel.login(context) {
+                Log.d("LoginScreen", "Login successful")
                 navController.navigate(Screen.InfoScreen.route)
             }
         },

@@ -7,10 +7,12 @@ appcompat = "1.7.0"
 composeBomVersion = "2023.01.00"
 constraintlayout = "2.1.4"
 converterGson = "2.9.0"
+core = "4.6.2"
 coreKtxVersion = "1.10.1"
 firebaseAnalyticsKtx = "22.0.2"
 firebaseAuthKtx = "23.0.0"
 firebaseBom = "33.1.2"
+flexmarkAll = "0.62.2"
 googleAccompanistNavigationAnimation = "0.34.0"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
@@ -36,6 +38,8 @@ uiTestManifest = "1.6.8"
 uiTooling = "1.6.8"
 uiToolingPreview = "1.6.8"
 workRuntimeKtx = "2.9.0"
+monitor = "1.7.1"
+junitKtx = "1.2.1"
 
 [libraries]
 accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanistNavigationAnimation" }
@@ -58,9 +62,16 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedata" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+core = { module = "io.noties.markwon:core", version.ref = "core" }
+ext-strikethrough = { module = "io.noties.markwon:ext-strikethrough", version.ref = "core" }
+ext-tables = { module = "io.noties.markwon:ext-tables", version.ref = "core" }
 firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx", version.ref = "firebaseAnalyticsKtx" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+flexmark = { module = "com.vladsch.flexmark:flexmark", version.ref = "flexmarkAll" }
+flexmark-all = { module = "com.vladsch.flexmark:flexmark-all", version.ref = "flexmarkAll" }
+flexmark-ext-strikethrough = { module = "com.vladsch.flexmark:flexmark-ext-strikethrough", version.ref = "flexmarkAll" }
+flexmark-ext-tables = { module = "com.vladsch.flexmark:flexmark-ext-tables", version.ref = "flexmarkAll" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -85,6 +96,8 @@ ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTestManifest" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
+androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
