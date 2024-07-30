@@ -82,3 +82,9 @@ fabric.properties
 /venv/
 .env
 
+/android_app/app/debug/
+/android_app/app/google-services.json
+!/android_app/app/google-services.json
+
+*.apk
+!/android_app/app/debug/
