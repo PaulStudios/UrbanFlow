@@ -79,6 +79,7 @@ To set up the UrbanFlow project locally, follow these steps:
    ```plaintext
    DATABASE_URL_ASYNC=postgresql+asyncpg://user:password@host/dbname
    DATABASE_URL=postgresql://user:password@host/dbname
+   API_URL = <Voluntary Data Collector API URL>
    GOOGLE_MAPS_API_KEY=your_google_maps_apikey
    SECRET_KEY=secret_key_used_for_hashing
    ALGORITHM=HS256
@@ -93,7 +94,8 @@ To set up the UrbanFlow project locally, follow these steps:
 5. **Run the Server**:
    Start the server with:
    ```bash
-   uvicorn server.main:app --reload 
+   python main.py train_and_evaluate --download
+   python main.py runserver
    ```
 
 ## Usage
