@@ -84,7 +84,7 @@ dependencies {
     implementation(libs.junit)
     implementation(libs.androidx.monitor)
     implementation(libs.androidx.junit.ktx)
-    androidTestImplementation(libs.junit)
+    implementation(libs.androidx.ui.test.junit4.android)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     debugImplementation(libs.ui.tooling)
@@ -106,7 +106,6 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.navigation.dynamic.features.fragment)
-    androidTestImplementation(libs.androidx.navigation.testing)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.androidx.work.runtime.ktx)
@@ -121,4 +120,21 @@ dependencies {
     implementation(libs.ext.strikethrough)
     implementation(libs.ext.tables)
 
+    // Testing dependencies
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.06.01"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // Mockito for mocking in tests
+    testImplementation("org.mockito:mockito-core:5.3.1")
+    androidTestImplementation("org.mockito:mockito-android:5.3.1")
+
+    // Navigation Testing
+    implementation("androidx.navigation:navigation-fragment-ktx:2.6.0")
+    implementation("androidx.navigation:navigation-ui-ktx:2.6.0")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.6.0")
 }
