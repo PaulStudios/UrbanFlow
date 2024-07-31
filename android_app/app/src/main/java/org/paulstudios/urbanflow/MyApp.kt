@@ -12,6 +12,7 @@ import com.google.accompanist.navigation.animation.composable
 import org.paulstudios.urbanflow.data.models.Screen
 import org.paulstudios.urbanflow.ui.screens.auth.LoginScreen
 import org.paulstudios.urbanflow.ui.screens.auth.RegisterScreen
+import org.paulstudios.urbanflow.ui.screens.auth.UserInfoRegister
 import org.paulstudios.urbanflow.ui.screens.map.MapScreen
 import org.paulstudios.urbanflow.ui.screens.others.InfoScreen
 import org.paulstudios.urbanflow.viewmodels.AuthViewModel
@@ -38,6 +39,9 @@ fun MyApp(navController: NavHostController, context: Context) {
         }
         composable(Screen.MapScreen.route) {
             MapScreen(navController = navController)
+        }
+        composable(Screen.RegisterDetails.route) {
+            UserInfoRegister(navController = navController)
         }
     }
 }

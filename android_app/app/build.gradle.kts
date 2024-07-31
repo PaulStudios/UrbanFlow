@@ -111,6 +111,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.play.services.auth)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.coil.compose)
 
     // Firebase implementation
     implementation(platform(libs.firebase.bom))
@@ -141,5 +142,15 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx.v260)
     implementation(libs.androidx.navigation.ui.ktx.v260)
     androidTestImplementation(libs.androidx.navigation.testing.v260)
+
+    // CameraX library
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
+    // Verification library
+    implementation(libs.face.detection)
+
 
 }

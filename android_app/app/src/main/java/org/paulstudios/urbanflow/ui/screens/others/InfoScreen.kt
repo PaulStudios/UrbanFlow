@@ -48,7 +48,7 @@ fun InfoScreen(navController: NavHostController) {
     LaunchedEffect(Unit) {
         if (infoScreenShown && consentGiven) {
             Log.i(TAG, "InfoScreen: Skipping to MapScreen")
-            navController.navigate(Screen.MapScreen.route) {
+            navController.navigate(Screen.RegisterDetails.route) {
                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
             }
         }
@@ -66,7 +66,7 @@ fun InfoScreen(navController: NavHostController) {
                         .putBoolean("consent_given", true)
                         .apply()
                     Log.d(TAG, "InfoScreen: Navigating to MapScreen after consent")
-                    navController.navigate(Screen.MapScreen.route) {
+                    navController.navigate(Screen.RegisterDetails.route) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 },
@@ -85,7 +85,7 @@ fun InfoScreen(navController: NavHostController) {
                         .apply()
                     if (consentGiven) {
                         Log.d(TAG, "InfoScreen: Navigating to MapScreen")
-                        navController.navigate(Screen.MapScreen.route) {
+                        navController.navigate(Screen.RegisterDetails.route) {
                             popUpTo(navController.graph.startDestinationId) { inclusive = true }
                         }
                     } else {
