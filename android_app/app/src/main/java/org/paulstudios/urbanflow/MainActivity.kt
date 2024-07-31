@@ -16,25 +16,28 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseApp
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.OAuthProvider
 import kotlinx.coroutines.launch
+import org.paulstudios.urbanflow.data.models.Screen
+import org.paulstudios.urbanflow.ui.theme.UrbanFlowTheme
 import org.paulstudios.urbanflow.viewmodels.AuthState
 import org.paulstudios.urbanflow.viewmodels.AuthViewModel
 import org.paulstudios.urbanflow.viewmodels.ServerStatusViewModel
-import org.paulstudios.urbanflow.data.models.Screen
-import org.paulstudios.urbanflow.ui.theme.UrbanFlowTheme
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
     private lateinit var authViewModel: AuthViewModel
     private lateinit var serverStatusViewModel: ServerStatusViewModel
+    lateinit var firebaseAnalytics: FirebaseAnalytics
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         authViewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application))[AuthViewModel::class.java]
         serverStatusViewModel = ViewModelProvider(this)[ServerStatusViewModel::class.java]
         setContent {

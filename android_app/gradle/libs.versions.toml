@@ -3,17 +3,19 @@ accompanistNavigationAnimation = "0.16.0"
 activityComposeVersion = "1.7.2"
 agp = "8.5.0"
 androidxComposeBom = "2024.02.00"
+androidxComposeBomVersion = "2023.06.01"
+androidxJunit = "1.1.5"
 appcompat = "1.7.0"
 composeBomVersion = "2023.01.00"
 constraintlayout = "2.1.4"
 converterGson = "2.9.0"
 core = "4.6.2"
 coreKtxVersion = "1.10.1"
-firebaseAnalyticsKtx = "22.0.2"
-firebaseAuthKtx = "23.0.0"
+espressoCoreVersion = "3.6.1"
 firebaseBom = "33.1.2"
 flexmarkAll = "0.62.2"
 googleAccompanistNavigationAnimation = "0.34.0"
+googleFirebaseBom = "33.1.2"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -27,7 +29,12 @@ composeBom = "2024.04.01"
 lifecycleRuntimeKtxVersion = "2.6.1"
 material = "1.12.0"
 material3 = "1.2.1"
+mockitoAndroid = "5.3.1"
+mockitoCore = "5.3.1"
 navigationFragmentKtx = "2.7.7"
+navigationFragmentKtxVersion = "2.6.0"
+navigationTesting = "2.6.0"
+navigationUiKtx = "2.6.0"
 playServicesAuth = "21.2.0"
 playServicesLocation = "21.3.0"
 retrofit = "2.9.0"
@@ -48,17 +55,25 @@ accompanist-navigation-animation-v0340 = { module = "com.google.accompanist:acco
 androidx-activity-compose-v172 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-compose-bom-v20230100 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
+androidx-compose-bom-v20230601 = { module = "androidx.compose:compose-bom", version.ref = "androidxComposeBomVersion" }
 androidx-compose-bom-v20240200 = { module = "androidx.compose:compose-bom", version.ref = "androidxComposeBom" }
+androidx-compose-ui-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+androidx-compose-ui-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-ktx-v1101 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
+androidx-espresso-core-v351 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
+androidx-junit-v115 = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-lifecycle-runtime-ktx-v261 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationFragmentKtx" }
 androidx-navigation-dynamic-features-fragment = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "navigationFragmentKtx" }
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+androidx-navigation-fragment-ktx-v260 = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtxVersion" }
 androidx-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationFragmentKtx" }
+androidx-navigation-testing-v260 = { module = "androidx.navigation:navigation-testing", version.ref = "navigationTesting" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationFragmentKtx" }
+androidx-navigation-ui-ktx-v260 = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationUiKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedata" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
@@ -66,9 +81,11 @@ converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref
 core = { module = "io.noties.markwon:core", version.ref = "core" }
 ext-strikethrough = { module = "io.noties.markwon:ext-strikethrough", version.ref = "core" }
 ext-tables = { module = "io.noties.markwon:ext-tables", version.ref = "core" }
-firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx", version.ref = "firebaseAnalyticsKtx" }
-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx" }
+firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "googleFirebaseBom" }
+firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx" }
+firebase-storage-ktx = { module = "com.google.firebase:firebase-storage-ktx" }
 flexmark = { module = "com.vladsch.flexmark:flexmark", version.ref = "flexmarkAll" }
 flexmark-all = { module = "com.vladsch.flexmark:flexmark-all", version.ref = "flexmarkAll" }
 flexmark-ext-strikethrough = { module = "com.vladsch.flexmark:flexmark-ext-strikethrough", version.ref = "flexmarkAll" }
@@ -90,10 +107,13 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
+ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTestManifest" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }

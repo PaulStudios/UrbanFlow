@@ -100,8 +100,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.analytics.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.compose)
@@ -112,8 +110,14 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.play.services.auth)
-
     implementation(libs.kotlinx.serialization.json)
+
+    // Firebase implementation
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.analytics.ktx)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.storage.ktx)
 
     // Markwon dependencies
     implementation(libs.core)
@@ -121,20 +125,21 @@ dependencies {
     implementation(libs.ext.tables)
 
     // Testing dependencies
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.06.01"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit.v115)
+    androidTestImplementation(libs.androidx.espresso.core.v351)
+    androidTestImplementation(platform(libs.androidx.compose.bom.v20230100))
+    androidTestImplementation(libs.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.ui.test.manifest)
 
     // Mockito for mocking in tests
-    testImplementation("org.mockito:mockito-core:5.3.1")
-    androidTestImplementation("org.mockito:mockito-android:5.3.1")
+    testImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.android)
 
     // Navigation Testing
-    implementation("androidx.navigation:navigation-fragment-ktx:2.6.0")
-    implementation("androidx.navigation:navigation-ui-ktx:2.6.0")
-    androidTestImplementation("androidx.navigation:navigation-testing:2.6.0")
+    implementation(libs.androidx.navigation.fragment.ktx.v260)
+    implementation(libs.androidx.navigation.ui.ktx.v260)
+    androidTestImplementation(libs.androidx.navigation.testing.v260)
+
 }
