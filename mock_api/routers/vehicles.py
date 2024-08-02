@@ -25,8 +25,11 @@ async def create_vehicle_registration(
     if db_vehicle:
         raise HTTPException(status_code=400, detail="Vehicle number already registered")
 
+    # Convert type abbreviation to full description
+    vehicle_dict = vehicle.dict()
+
     # Create new vehicle registration
-    new_vehicle = models.VehicleRegistration(**vehicle.dict())
+    new_vehicle = models.VehicleRegistration(**vehicle_dict)
     new_vehicle.status = True
     new_vehicle.issued_date = datetime.now()
     new_vehicle.valid_from_date = datetime.now()

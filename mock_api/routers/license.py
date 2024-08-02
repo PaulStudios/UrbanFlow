@@ -6,6 +6,7 @@ from sqlalchemy.future import select
 
 from mock_api import schemas, database, models
 from mock_api.auth import auth
+from mock_api.models import Type
 
 router = APIRouter(
     prefix="/license",
@@ -27,8 +28,10 @@ async def create_license(
     if db_license:
         raise HTTPException(status_code=400, detail="License number already registered")
 
+    driving_license_dict = driving_license.dict()
+
     # Create new license
-    new_license = models.DrivingLicense(**driving_license.dict())
+    new_license = models.DrivingLicense(**driving_license_dict)
     new_license.status = True
     new_license.issued_date = datetime.now()
     new_license.expiry_date = datetime.now() + timedelta(days=365.25 * 5)  # Set expiry to 5 years from now

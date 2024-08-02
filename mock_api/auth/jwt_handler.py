@@ -10,7 +10,7 @@ from mock_api.auth.schemas import TokenData
 load_dotenv()
 
 SECRET_KEY = os.getenv('MOCK_SECRET_KEY')
-ALGORITHM = os.getenv('MOCKALGORITHM')
+ALGORITHM = os.getenv('MOCK_ALGORITHM')
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

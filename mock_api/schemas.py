@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from mock_api.models import Type
 
@@ -11,20 +11,32 @@ class DrivingLicenseBase(BaseModel):
     age: int
     gender: str
     language: str
-    type: Type
+    type: str
     issued_by: str
+    number: str
 
 
 class DrivingLicenseCreate(DrivingLicenseBase):
-    number: str
+    @validator('type')
+    def validate_type(cls, v):
+        if v not in Type.__members__:
+            raise ValueError(f"Invalid type: {v}. Expected one of {list(Type.__members__.keys())}")
+        return v
+
+    class Config:
+        orm_mode = True
 
 
-class DrivingLicense(DrivingLicenseCreate):
-    number: str
+class DrivingLicense(DrivingLicenseBase):
     expiry_date: datetime
-    name: str
-    age: int
     status: bool
+
+    @validator('type', pre=True, always=True)
+    def convert_type_to_abbreviation(cls, v):
+        for member in Type:
+            if member.value == v:
+                return member.name
+        return v
 
     class Config:
         orm_mode = True
@@ -32,21 +44,33 @@ class DrivingLicense(DrivingLicenseCreate):
 
 class VehicleRegistrationBase(BaseModel):
     name: str
-    type: Type
+    type: str
     language: str
     issued_by: str
+    number: str
 
 
 class VehicleRegistrationCreate(VehicleRegistrationBase):
-    number: str
+    @validator('type')
+    def validate_type(cls, v):
+        if v not in Type.__members__:
+            raise ValueError(f"Invalid type: {v}. Expected one of {list(Type.__members__.keys())}")
+        return v
+
+    class Config:
+        orm_mode = True
 
 
-class VehicleRegistration(VehicleRegistrationCreate):
-    number: str
+class VehicleRegistration(VehicleRegistrationBase):
     expiry_date: datetime
-    name: str
-    age: int
     status: bool
+
+    @validator('type', pre=True, always=True)
+    def convert_type_to_abbreviation(cls, v):
+        for member in Type:
+            if member.value == v:
+                return member.name
+        return v
 
     class Config:
         orm_mode = True
