@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import re
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -49,6 +50,8 @@ async def get_driving_license(
         db: AsyncSession = Depends(database.get_db),
         api_key: auth.models.APIKey = Depends(auth.get_api_key)
 ):
+    if not re.match(r'^[A-Z]{2}-\d{2}-[A-Z]{1,2}-\d{1,4}$', license_number):
+        raise HTTPException(status_code=400, detail="Invalid license number")
     query = select(models.DrivingLicense).where(models.DrivingLicense.number == license_number)
     result = await db.execute(query)
     license = result.scalar_one_or_none()
