@@ -109,6 +109,7 @@ class VehicleRegistrationBase(BaseModel):
         # Validate the state code
         if state_code not in valid_state_codes:
             raise ValueError('Invalid state code')
+        return v
 
 
 class VehicleRegistrationCreate(VehicleRegistrationBase):

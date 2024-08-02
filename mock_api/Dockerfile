@@ -17,7 +17,7 @@ COPY . .
 RUN pip install alembic
 
 # Expose the port the app runs on
-EXPOSE 8000
+EXPOSE 8001
 
 # Initialize the database using Alembic and run the application
 CMD alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000

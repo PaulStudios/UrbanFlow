@@ -6,8 +6,8 @@ services:
     ports:
       - "8001:8001"
     volumes:
-      - data:/mock_api
-    restart: unless-stopped
+      - data:/mock_api  # Mount local directory
+    restart: unless-stopped  # Restart policy for the service
 
 
   ngrok:
