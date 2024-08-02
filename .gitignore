@@ -88,3 +88,4 @@ fabric.properties
 
 *.apk
 !/android_app/app/debug/
+/firebase-accesskey.json

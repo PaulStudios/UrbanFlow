@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  fastapi:
+    image: hilfing/mock_api:0.6.5
+    ports:
+      - "8001:8001"
+    volumes:
+      - data:/mock_api
+    restart: unless-stopped
+
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    volumes:
+      - ./ngrok.yml:/etc/ngrok/ngrok.yml
+    command: start --config /etc/ngrok/ngrok.yml web
+    network_mode: host
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    depends_on:
+      - fastapi
+
+volumes:
+  data:

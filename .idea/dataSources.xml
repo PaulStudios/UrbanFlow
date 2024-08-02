@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://ep-summer-thunder-a1w2afd4.ap-southeast-1.aws.neon.tech:5432/urbanflow</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="Neon Database (Mock API)" uuid="bc22ee77-1331-44ac-9417-7bb967a3ba7f">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://ep-summer-thunder-a1w2afd4.ap-southeast-1.aws.neon.tech:5432/mock_api</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
