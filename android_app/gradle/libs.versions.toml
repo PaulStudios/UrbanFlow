@@ -6,6 +6,8 @@ androidxComposeBom = "2024.02.00"
 androidxComposeBomVersion = "2023.06.01"
 androidxJunit = "1.1.5"
 appcompat = "1.7.0"
+bcprovJdk15on = "1.68"
+bctlsJdk15on = "1.58.0.0"
 cameraxVersion = "1.4.0-beta02"
 coilCompose = "2.7.0"
 composeBomVersion = "2023.01.00"
@@ -84,6 +86,8 @@ androidx-navigation-ui-ktx-v260 = { module = "androidx.navigation:navigation-ui-
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedata" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bcprovJdk15on" }
+bctls-jdk15on = { module = "com.madgag.spongycastle:bctls-jdk15on", version.ref = "bctlsJdk15on" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 core = { module = "io.noties.markwon:core", version.ref = "core" }

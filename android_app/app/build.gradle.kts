@@ -152,5 +152,7 @@ dependencies {
     // Verification library
     implementation(libs.face.detection)
 
+    implementation(libs.bctls.jdk15on)
+
 
 }

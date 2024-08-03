@@ -1,5 +1,6 @@
-from pydantic import BaseModel, UUID4
 from datetime import datetime
+
+from pydantic import BaseModel, UUID4
 
 
 class TrafficSignalBase(BaseModel):
@@ -23,3 +24,13 @@ class TrafficSignal(TrafficSignalBase):
 
     class Config:
         orm_mode = True
+
+
+class PublicKeyRequest(BaseModel):
+    public_key: str
+    kdf: str = "hkdf"
+
+
+class EncryptedDataRequest(BaseModel):
+    encrypted_data: str
+    iv: str

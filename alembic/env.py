@@ -3,11 +3,9 @@ from logging.config import fileConfig
 
 from alembic import context
 from dotenv import load_dotenv
-from sqlalchemy import engine_from_config, create_engine
-from sqlalchemy import pool
+from sqlalchemy import create_engine
 
-from server.models import TrafficSignal, Base
-from server.auth.models import User, APIKey
+from server.models import Base
 
 load_dotenv()
 

@@ -19,8 +19,11 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.OAuthProvider
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.paulstudios.urbanflow.data.models.Screen
+import org.paulstudios.urbanflow.network.SecureApiClient
 import org.paulstudios.urbanflow.ui.theme.UrbanFlowTheme
 import org.paulstudios.urbanflow.viewmodels.AuthState
 import org.paulstudios.urbanflow.viewmodels.AuthViewModel
@@ -30,14 +33,28 @@ class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
     private lateinit var authViewModel: AuthViewModel
     private lateinit var serverStatusViewModel: ServerStatusViewModel
+    private lateinit var secureApiClient: SecureApiClient
     lateinit var firebaseAnalytics: FirebaseAnalytics
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    @OptIn(ExperimentalAnimationApi::class)
+    @OptIn(ExperimentalAnimationApi::class, DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        secureApiClient = SecureApiClient("http://10.0.2.2:8000/api/encryption/")
+
+        // Perform key exchange when the app starts
+        GlobalScope.launch {
+            try {
+                secureApiClient.exchangeKey()
+                // Key exchange successful, you can now use sendData() and receiveData()
+                testEncryptedCommunication()
+            } catch (e: Exception) {
+                // Handle key exchange error
+                e.printStackTrace()
+            }
+        }
         authViewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application))[AuthViewModel::class.java]
         serverStatusViewModel = ViewModelProvider(this)[ServerStatusViewModel::class.java]
         setContent {
@@ -57,6 +74,20 @@ class MainActivity : ComponentActivity() {
         val (isLoggedIn, _) = authViewModel.checkLoginState()
         if (isLoggedIn) {
             navigateToMainScreen()
+        }
+    }
+
+    private suspend fun testEncryptedCommunication() {
+        try {
+            // Send encrypted data to the server
+            secureApiClient.sendData("Hello from Android!")
+
+            // Receive encrypted data from the server
+            val receivedData = secureApiClient.receiveData()
+            println("Received data from server: $receivedData")
+        } catch (e: Exception) {
+            // Handle communication error
+            e.printStackTrace()
         }
     }
 

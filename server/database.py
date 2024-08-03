@@ -11,7 +11,7 @@ connect_args = {
     "ssl": "require"
 }
 
-engine = create_async_engine(DATABASE_URL, echo=True, future=True, connect_args=connect_args)
+engine = create_async_engine(DATABASE_URL, echo=False, future=True, connect_args=connect_args)
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 Base = declarative_base()

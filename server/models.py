@@ -1,7 +1,10 @@
-from sqlalchemy import Column, String, Float, Integer, DateTime, func, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
-from server.database import Base
 import uuid
+
+from sqlalchemy import Column, String, Float, DateTime, func, UniqueConstraint
+from sqlalchemy.dialects.postgresql import UUID
+
+from server.database import Base
+
 
 class TrafficSignal(Base):
     __tablename__ = "traffic_signals"
