@@ -1,12 +1,16 @@
 package org.paulstudios.urbanflow.network
 
+import android.content.Context
 import android.util.Base64
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.paulstudios.datasurvey.network.ApiService
 import org.paulstudios.datasurvey.network.EncryptedDataRequest
 import org.paulstudios.datasurvey.network.PublicKeyRequest
+import org.paulstudios.datasurvey.network.UserBase
 import org.paulstudios.urbanflow.utils.CryptoUtils
 import org.paulstudios.urbanflow.utils.CryptoUtils.generateSharedSecret
 import org.paulstudios.urbanflow.utils.CryptoUtils.getOrGenerateKeyPair
@@ -20,10 +24,16 @@ import java.security.KeyStore
 import java.security.spec.X509EncodedKeySpec
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
+import javax.crypto.spec.GCMParameterSpec
 
 private const val KEY_ALIAS = "MyAppKeyPair"
 
-class SecureApiClient(baseUrl: String) {
+class SecureApiClient(baseUrl: String, private val context: Context) {
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
         .addConverterFactory(GsonConverterFactory.create())
@@ -33,33 +43,89 @@ class SecureApiClient(baseUrl: String) {
     private var sharedKey: ByteArray? = null
     private val TAG = "SecureApiClient"
 
+    private val keyAlias = "SharedKeyAlias"
+    private val sharedPrefsName = "SecureApiClientPrefs"
+
+    private lateinit var clientId: String
+
+    private fun saveSharedKey(key: ByteArray) {
+        val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
+        val keyGenParameterSpec = KeyGenParameterSpec.Builder(keyAlias,
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+            .build()
+
+        keyGenerator.init(keyGenParameterSpec)
+        val secretKey = keyGenerator.generateKey()
+
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+
+        val encryptedKey = cipher.doFinal(key)
+        val iv = cipher.iv
+
+        val combinedData = iv + encryptedKey
+
+        val prefs = context.getSharedPreferences(sharedPrefsName, Context.MODE_PRIVATE)
+        prefs.edit().putString("encrypted_shared_key", Base64.encodeToString(combinedData, Base64.DEFAULT)).apply()
+    }
+
+    private fun loadSharedKey(): ByteArray? {
+        val prefs = context.getSharedPreferences(sharedPrefsName, Context.MODE_PRIVATE)
+        val encodedCombinedData = prefs.getString("encrypted_shared_key", null) ?: return null
+
+        val combinedData = Base64.decode(encodedCombinedData, Base64.DEFAULT)
+        val iv = combinedData.slice(0 until 12).toByteArray()
+        val encryptedKey = combinedData.slice(12 until combinedData.size).toByteArray()
+
+        val keyStore = KeyStore.getInstance("AndroidKeyStore")
+        keyStore.load(null)
+
+        val secretKeyEntry = keyStore.getEntry(keyAlias, null) as? KeyStore.SecretKeyEntry
+        val secretKey = secretKeyEntry?.secretKey ?: return null
+
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(128, iv))
+
+        return cipher.doFinal(encryptedKey)
+    }
 
     suspend fun exchangeKey() {
         withContext(Dispatchers.IO) {
             try {
+                // Try to load the existing shared key
+                sharedKey = loadSharedKey()
                 val keyPair = getOrGenerateKeyPair()
-                val publicKeyBase64 = Base64.encodeToString(keyPair.public.encoded, Base64.NO_WRAP)
+                clientId = Base64.encodeToString(keyPair.public.encoded, Base64.URL_SAFE or Base64.NO_WRAP)
 
-                Log.d("SecureApiClient", "Sending public key: $publicKeyBase64")
-                val response = apiService.exchangeKey(PublicKeyRequest(publicKeyBase64, "HKDF"))
+                if (sharedKey == null) {
+                    val publicKeyBase64 = Base64.encodeToString(keyPair.public.encoded, Base64.NO_WRAP)
 
-                if (response.isSuccessful) {
-                    val serverPublicKeyBase64 = response.body() ?: throw Exception("Empty response body")
-                    val serverPublicKey = KeyFactory.getInstance("EC").generatePublic(
-                        X509EncodedKeySpec(Base64.decode(serverPublicKeyBase64, Base64.NO_WRAP))
-                    )
+                    Log.d("SecureApiClient", "Sending public key: $publicKeyBase64")
+                    val response = apiService.exchangeKey(PublicKeyRequest(publicKeyBase64, "HKDF"))
 
-                    val privateKey = keyPair.private
-                    val sharedSecret = generateSharedSecret(privateKey, serverPublicKey)
-                    Log.d(TAG, "Shared secret (first 10 bytes): ${sharedSecret.toHex()}")
+                    if (response.isSuccessful) {
+                        val serverPublicKeyBase64 = response.body() ?: throw Exception("Empty response body")
+                        val serverPublicKey = KeyFactory.getInstance("EC").generatePublic(
+                            X509EncodedKeySpec(Base64.decode(serverPublicKeyBase64, Base64.NO_WRAP))
+                        )
 
-                    // Perform HKDF
-                    sharedKey = performHKDF(sharedSecret)
-                    Log.d(TAG, "Shared key (first 10 bytes): ${sharedKey!!.toHex()}")
+                        val privateKey = keyPair.private
+                        val sharedSecret = generateSharedSecret(privateKey, serverPublicKey)
+                        Log.d(TAG, "Shared secret (first 10 bytes): ${sharedSecret.toHex()}")
 
+                        // Perform HKDF
+                        sharedKey = performHKDF(sharedSecret)
+                        Log.d(TAG, "Shared key (first 10 bytes): ${sharedKey!!.toHex()}")
+
+                        saveSharedKey(sharedKey!!)
+                    } else {
+                        val errorBody = response.errorBody()?.string()
+                        throw Exception("Key exchange failed: ${response.code()} - $errorBody")
+                    }
                 } else {
-                    val errorBody = response.errorBody()?.string()
-                    throw Exception("Key exchange failed: ${response.code()} - $errorBody")
+                    Log.d(TAG, "Loaded existing shared key")
                 }
             } catch (e: Exception) {
                 Log.e("SecureApiClient", "Key exchange error", e)
@@ -112,7 +178,24 @@ class SecureApiClient(baseUrl: String) {
             val encryptedDataBase64 = Base64.encodeToString(encryptedData, Base64.NO_WRAP)
             val ivBase64 = Base64.encodeToString(iv, Base64.NO_WRAP)
 
-            val request = EncryptedDataRequest(encryptedDataBase64, ivBase64)
+            val request = EncryptedDataRequest(clientId, encryptedDataBase64, ivBase64)
+            Log.d(TAG, "Sending data: ${request.encrypted_data}")
+            apiService.sendData(request)
+        }
+    }
+
+    suspend fun sendUserVerify(userData: UserBase) {
+        withContext(Dispatchers.IO) {
+            if (sharedKey == null) {
+                exchangeKey()
+            }
+
+            val jsonData = Json.encodeToString(userData)
+            val (encryptedData, iv) = CryptoUtils.encrypt(jsonData.toByteArray(), sharedKey!!)
+            val encryptedDataBase64 = Base64.encodeToString(encryptedData, Base64.NO_WRAP)
+            val ivBase64 = Base64.encodeToString(iv, Base64.NO_WRAP)
+
+            val request = EncryptedDataRequest(clientId, encryptedDataBase64, ivBase64)
             apiService.sendData(request)
         }
     }
@@ -123,12 +206,17 @@ class SecureApiClient(baseUrl: String) {
                 exchangeKey()
             }
 
-            val (encryptedDataBase64, ivBase64) = apiService.receiveData()
-            val encryptedData = Base64.decode(encryptedDataBase64, Base64.NO_WRAP)
-            val iv = Base64.decode(ivBase64, Base64.NO_WRAP)
+            val response = apiService.receiveData(clientId)
+            if (response.isSuccessful) {
+                val body = response.body() ?: throw Exception("Empty response body")
+                val encryptedData = Base64.decode(body.encrypted_data, Base64.NO_WRAP)
+                val iv = Base64.decode(body.iv, Base64.NO_WRAP)
 
-            val decryptedData = CryptoUtils.decrypt(encryptedData, sharedKey!!, iv)
-            String(decryptedData)
+                val decryptedData = CryptoUtils.decrypt(encryptedData, sharedKey!!, iv)
+                String(decryptedData)
+            } else {
+                throw Exception("Failed to receive data: ${response.code()} - ${response.errorBody()?.string()}")
+            }
         }
     }
 }

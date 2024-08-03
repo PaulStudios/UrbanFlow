@@ -1,5 +1,6 @@
 import base64
 import logging
+from urllib.parse import unquote
 
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
@@ -8,12 +9,10 @@ from Crypto.PublicKey import ECC
 from Crypto.Util.Padding import pad, unpad
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 
 from server.database import get_db
-from server.models import ClientKey
 from server.schemas import PublicKeyRequest, EncryptedDataRequest
-from server.utils.encyption_key import server_key, save_shared_key, perform_hkdf
+from server.utils.encyption_key import server_key, save_shared_key, perform_hkdf, load_shared_key
 
 router = APIRouter(
     prefix="/api/encryption",
@@ -27,6 +26,7 @@ logger = logging.getLogger(__name__)
 def hkdf_function(shared_secret: bytes) -> bytes:
     return HKDF(shared_secret, 32, b"", SHA256)
 
+
 @router.post("/exchange_key")
 async def exchange_key(request: PublicKeyRequest, db: AsyncSession = Depends(get_db)):
     logger.debug(f"Received public key: {request.public_key}")
@@ -37,16 +37,16 @@ async def exchange_key(request: PublicKeyRequest, db: AsyncSession = Depends(get
 
         # Perform ECDH key exchange
         shared_secret_point = client_public_key.pointQ * server_key.d
-        shared_secret_bytes = int(shared_secret_point.x).to_bytes((int(shared_secret_point.x).bit_length() + 7) // 8, byteorder='big')
+        shared_secret_bytes = int(shared_secret_point.x).to_bytes((int(shared_secret_point.x).bit_length() + 7) // 8,
+                                                                  byteorder='big')
         logger.debug(f"Shared secret: {shared_secret_bytes.hex()}")
 
         # Derive the final shared key using HKDF
         shared_key = perform_hkdf(shared_secret_bytes)
         logger.debug(f"Generated shared key: {shared_key.hex()}")
 
-
-        # Save shared key
-        client_id = base64.b64encode(client_public_key.export_key(format='DER')).decode()
+        # Save the shared key along with client id
+        client_id = base64.urlsafe_b64encode(client_public_key.export_key(format='DER')).decode()
         await save_shared_key(db, client_id, shared_key)
 
         # Return server's public key
@@ -59,20 +59,15 @@ async def exchange_key(request: PublicKeyRequest, db: AsyncSession = Depends(get
 
 @router.post("/send_data")
 async def send_data(request: EncryptedDataRequest, db: AsyncSession = Depends(get_db)):
+    logger.debug(f"Received encrypted data: {request.encrypted_data}")
     try:
-        result = await db.execute(select(ClientKey))
-        client_key = result.scalar_one_or_none()
-        if not client_key:
-            raise HTTPException(status_code=400, detail="No clients registered")
-
-        shared_key = client_key.shared_key
-        logger.debug(f"Shared key (first 10 bytes): {shared_key[:10].hex()}")
+        # Load the shared key for the specific client
+        shared_key = await load_shared_key(db, request.client_id)
+        if not shared_key:
+            raise HTTPException(status_code=400, detail="Client not registered")
 
         encrypted_data = base64.b64decode(request.encrypted_data)
         iv = base64.b64decode(request.iv)
-
-        logger.debug(f"IV: {iv.hex()}")
-        logger.debug(f"Encrypted data length: {len(encrypted_data)}")
 
         cipher = AES.new(shared_key[:32], AES.MODE_CBC, iv)
         try:
@@ -82,26 +77,19 @@ async def send_data(request: EncryptedDataRequest, db: AsyncSession = Depends(ge
             logger.error(f"Decryption failed: {str(ve)}")
             raise HTTPException(status_code=400, detail="Decryption failed")
 
-        # Process the decrypted data as needed
-
         return {"status": "success"}
     except Exception as e:
         logger.error(f"Error in send_data: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/receive_data")
-async def receive_data(db: AsyncSession = Depends(get_db)):
-    # In a production environment, you would need to identify the client
-    # For simplicity, we'll use the first client in our storage
-    result = await db.execute(select(ClientKey))
-    client_key = result.scalar_one_or_none()
-    if not client_key:
-        raise HTTPException(status_code=400, detail="No clients registered")
+@router.get("/receive_data/{client_id}")
+async def receive_data(client_id: str, db: AsyncSession = Depends(get_db)):
+    decoded_client_id = unquote(client_id)
+    shared_key = await load_shared_key(db, decoded_client_id)
+    if not shared_key:
+        raise HTTPException(status_code=400, detail="Client not registered")
 
-    shared_key = client_key.shared_key
-
-    # Example data to send
     data = "Hello from the server!"
 
     cipher = AES.new(shared_key[:32], AES.MODE_CBC)

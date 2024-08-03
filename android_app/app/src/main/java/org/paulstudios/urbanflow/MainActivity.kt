@@ -42,16 +42,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
-        secureApiClient = SecureApiClient("http://10.0.2.2:8000/api/encryption/")
+        secureApiClient = SecureApiClient("http://10.0.2.2:8000/", context = this)
 
         // Perform key exchange when the app starts
         GlobalScope.launch {
             try {
-                secureApiClient.exchangeKey()
-                // Key exchange successful, you can now use sendData() and receiveData()
                 testEncryptedCommunication()
             } catch (e: Exception) {
-                // Handle key exchange error
                 e.printStackTrace()
             }
         }
