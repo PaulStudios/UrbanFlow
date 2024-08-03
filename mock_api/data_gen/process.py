@@ -1,12 +1,10 @@
 import os
+import sys
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 
-import asyncio
 import requests
-import uuid
-import sys
-
 from dotenv import load_dotenv
 
 from mock_api.data_gen.gen_license import gen_license
@@ -49,7 +47,7 @@ except ValueError:
 if user_uuid:
     api_key_data = {
         "user_id": str(user_uuid),  # Valid UUID
-        "expires_at": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat()  # Example: 30 days from now
+        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=60)).isoformat()  # Example: 30 days from now
     }
     api_key_response = requests.post(f"{base_url}/auth/api-key", json=api_key_data, headers=headers)
     if api_key_response.status_code == 200:
@@ -63,8 +61,8 @@ headers = {
         "X-API-Key": api_key
 }
 
-licenses = [gen_license() for _ in range(2)]
-vehicles = [gen_vehicle() for _ in range(2)]
+licenses = [gen_license() for _ in range(50)]
+vehicles = [gen_vehicle() for _ in range(50)]
 
 with ThreadPoolExecutor() as executor:
     # Create tasks for both uploads
