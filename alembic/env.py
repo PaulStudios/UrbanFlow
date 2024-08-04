@@ -5,8 +5,8 @@ from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
-from server.models import Base
-
+from server.models import Base, TrafficSignal, ClientKey
+from server.auth.models import User, APIKey
 load_dotenv()
 
 # Load the config file for logging

@@ -1,12 +1,10 @@
 package org.paulstudios.datasurvey.network
 
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-import retrofit2.http.Query
 
 interface TrackerAPI {
     @GET("/status")
@@ -14,7 +12,7 @@ interface TrackerAPI {
 
 }
 
-interface ApiService {
+interface EncyptedApiService {
     @POST("api/encryption/exchange_key")
     suspend fun exchangeKey(@Body request: PublicKeyRequest): Response<String>
 
@@ -23,6 +21,9 @@ interface ApiService {
 
     @GET("api/encryption/receive_data/{clientId}")
     suspend fun receiveData(@Path("clientId") clientId: String): Response<EncryptedDataResponse>
+
+    @GET("api/encryption/check_key_validity/{clientId}")
+    suspend fun checkKeyValidity(@Path("clientId") clientId: String): Response<Unit>
 }
 
 data class PublicKeyRequest(

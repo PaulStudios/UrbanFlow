@@ -1,7 +1,7 @@
 import hashlib
 import hmac
-import logging
 import os
+import logging
 
 from Crypto.PublicKey import ECC
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,7 +13,12 @@ SERVER_KEY_FILE = "server_key.pem"
 logger = logging.getLogger(__name__)
 
 
-def generate_or_load_server_key():
+def generate_or_load_server_key(del_key: bool = False):
+    if del_key:
+        try:
+            os.remove(SERVER_KEY_FILE)
+        except FileNotFoundError:
+            logger.error("Server key file not found")
     if os.path.exists(SERVER_KEY_FILE):
         with open(SERVER_KEY_FILE, "rt") as f:
             return ECC.import_key(f.read())
@@ -37,7 +42,9 @@ async def save_shared_key(db: AsyncSession, client_id: str, shared_key: bytes):
 async def load_shared_key(db: AsyncSession, client_id: str):
     result = await db.execute(select(ClientKey).filter(ClientKey.client_id == client_id))
     client_key = result.scalar_one_or_none()
-    return client_key.shared_key if client_key else None
+    if client_key and client_key.is_valid:
+        return client_key.shared_key
+    return None
 
 
 def perform_hkdf(shared_secret, salt=None, info=b'', key_len=32):

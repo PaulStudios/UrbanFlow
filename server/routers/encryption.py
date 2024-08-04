@@ -8,11 +8,15 @@ from Crypto.Protocol.KDF import HKDF
 from Crypto.PublicKey import ECC
 from Crypto.Util.Padding import pad, unpad
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from mock_api.auth import auth
 from server.database import get_db
+from server.models import ClientKey
 from server.schemas import PublicKeyRequest, EncryptedDataRequest
-from server.utils.encyption_key import server_key, save_shared_key, perform_hkdf, load_shared_key
+from server.utils.encyption_key import server_key, save_shared_key, perform_hkdf, load_shared_key, \
+    generate_or_load_server_key
 
 router = APIRouter(
     prefix="/api/encryption",
@@ -64,7 +68,7 @@ async def send_data(request: EncryptedDataRequest, db: AsyncSession = Depends(ge
         # Load the shared key for the specific client
         shared_key = await load_shared_key(db, request.client_id)
         if not shared_key:
-            raise HTTPException(status_code=400, detail="Client not registered")
+            raise HTTPException(status_code=400, detail="Client not registered or Client Key is invalid")
 
         encrypted_data = base64.b64decode(request.encrypted_data)
         iv = base64.b64decode(request.iv)
@@ -88,7 +92,7 @@ async def receive_data(client_id: str, db: AsyncSession = Depends(get_db)):
     decoded_client_id = unquote(client_id)
     shared_key = await load_shared_key(db, decoded_client_id)
     if not shared_key:
-        raise HTTPException(status_code=400, detail="Client not registered")
+        raise HTTPException(status_code=400, detail="Client not registered or Client Key is invalid")
 
     data = "Hello from the server!"
 
@@ -99,3 +103,27 @@ async def receive_data(client_id: str, db: AsyncSession = Depends(get_db)):
         "encrypted_data": base64.b64encode(encrypted_data).decode(),
         "iv": base64.b64encode(cipher.iv).decode()
     }
+
+
+@router.get("/check_key_validity/{client_id}")
+async def check_key_validity(client_id: str, db: AsyncSession = Depends(get_db)):
+    shared_key = await load_shared_key(db, client_id)
+    if not shared_key:
+        raise HTTPException(status_code=401, detail="Key invalid or not found")
+    return {"status": "valid"}
+
+
+@router.post("/invalidate_keys")
+async def invalidate_keys(
+        db: AsyncSession = Depends(get_db, ),
+        api_key: auth.models.APIKey = Depends(auth.get_api_key)
+):
+    try:
+        generate_or_load_server_key(del_key=True)
+        await db.execute(update(ClientKey).values(is_valid=False))
+        await db.commit()
+        logger.info("Server keypair rotated and all client keys invalidated")
+        return {"status": "success", "message": "Server keypair rotated and all keys invalidated"}
+    except Exception as e:
+        logger.error(f"Error rotating server keypair and invalidating keys: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")

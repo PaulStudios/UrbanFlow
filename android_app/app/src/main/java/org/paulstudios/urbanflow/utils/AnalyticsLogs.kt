@@ -22,3 +22,42 @@ fun logUserInfoSubmission(success: Boolean) {
         param("success", success.toString())
     }
 }
+
+fun logDataReceived(success: Boolean, clientId: String, e: String? = null) {
+    if (success) {
+        firebaseAnalytics.logEvent("data_received_successfully") {
+            param("client_id", clientId)
+        }
+    } else {
+        firebaseAnalytics.logEvent("data_receive_error") {
+            param("client_id", clientId)
+            param("error_message", e ?: "Unknown error")
+        }
+    }
+}
+
+fun logKeyExchange(success: Boolean, clientId: String, e: String? = null) {
+    if (success) {
+        firebaseAnalytics.logEvent("key_exchange_success") {
+            param("client_id", clientId)
+        }
+    } else {
+        firebaseAnalytics.logEvent("key_exchange_error") {
+            param("client_id", clientId)
+            param("error_message", e ?: "Unknown error")
+        }
+    }
+}
+
+fun logDataSent(success: Boolean, clientId: String, e: String? = null) {
+    if (success) {
+        firebaseAnalytics.logEvent("data_sent_successfully") {
+            param("client_id", clientId)
+        }
+    } else {
+        firebaseAnalytics.logEvent("data_send_error") {
+            param("client_id", clientId)
+            param("error_message", e ?: "Unknown error")
+        }
+    }
+}
