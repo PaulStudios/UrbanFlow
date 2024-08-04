@@ -24,6 +24,9 @@ interface EncyptedApiService {
 
     @GET("api/encryption/check_key_validity/{clientId}")
     suspend fun checkKeyValidity(@Path("clientId") clientId: String): Response<Unit>
+
+    @POST("api/verify/user")
+    suspend fun verifyUser(@Body request: EncryptedDataRequest): Response<EncryptedDataResponse>
 }
 
 data class PublicKeyRequest(
@@ -42,11 +45,15 @@ data class EncryptedDataResponse(
 data class UserBase(
     val id: String,
     val name: String,
-    val dateOfBirth: String,  // Use ISO8601 format
-    val mobileNumber: String,
-    val licenseNumber: String,
-    val vehicleNumber: String,
-    val aadharNumber: String,
-    val permitUri: String,
-    val selfieUri: String
+    val date_of_birth: String,  // Use ISO8601 format
+    val mobile_number: String,
+    val license_number: String,
+    val vehicle_number: String,
+    val aadhar_number: String,
+    val permit_uri: String,
+    val selfie_uri: String
+)
+data class VerifyResponse(
+    val status: String,
+    val checked_at: String,
 )

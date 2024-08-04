@@ -61,6 +61,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import org.paulstudios.datasurvey.network.UserBase
 import org.paulstudios.urbanflow.utils.logSelfieAttempt
 import org.paulstudios.urbanflow.utils.logSelfieFaceDetectionResult
 import java.io.File
@@ -69,6 +70,7 @@ import java.util.Locale
 import java.util.concurrent.Executor
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import org.paulstudios.urbanflow.network.SecureApiClient
 
 private const val TAG = "UserInfoRegister"
 
@@ -81,6 +83,7 @@ fun UserInfoRegister(navController: NavHostController) {
     var dob by remember { mutableStateOf("") }
     var mobileNo by remember { mutableStateOf("") }
     var drivingLicenseNo by remember { mutableStateOf("") }
+    var vehicleNo by remember { mutableStateOf("") }
     var aadharNo by remember { mutableStateOf("") }
     var emergencyVehiclePermitUri by remember { mutableStateOf<Uri?>(null) }
     var selfieUri by remember { mutableStateOf<Uri?>(null) }
@@ -98,6 +101,8 @@ fun UserInfoRegister(navController: NavHostController) {
 
     var selfieRetryCount by remember { mutableIntStateOf(0) }
     val maxRetries = 3
+
+    val secureApiClient: SecureApiClient = SecureApiClient("http://10.0.2.2:8000/", context = context)
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -149,6 +154,11 @@ fun UserInfoRegister(navController: NavHostController) {
             value = drivingLicenseNo,
             onValueChange = { drivingLicenseNo = it },
             label = { Text("Driving License Number") }
+        )
+        OutlinedTextField(
+            value = vehicleNo,
+            onValueChange = { vehicleNo = it },
+            label = { Text("Vehicle Number") }
         )
         OutlinedTextField(
             value = aadharNo,
@@ -296,8 +306,18 @@ fun UserInfoRegister(navController: NavHostController) {
         Button(onClick = {
             coroutineScope.launch {
             submitUserInfo(
-                firstName, lastName, gender, dob, mobileNo, drivingLicenseNo, aadharNo,
-                emergencyVehiclePermitUri, selfieUri)
+                firstName,
+                lastName,
+                gender,
+                dob,
+                mobileNo,
+                drivingLicenseNo,
+                vehicleNo,
+                aadharNo,
+                emergencyVehiclePermitUri,
+                selfieUri,
+                secureApiClient
+            )
         }
              }) {
             Text("Submit")
@@ -311,8 +331,8 @@ fun showHelpOrContactSupport() {
 
 private suspend fun submitUserInfo(
     firstName: String, lastName: String, gender: String, dob: String,
-    mobileNo: String, drivingLicenseNo: String, aadharNo: String,
-    emergencyVehiclePermitUri: Uri?, selfieUri: Uri?
+    mobileNo: String, drivingLicenseNo: String, vehicleNo: String ,aadharNo: String,
+    emergencyVehiclePermitUri: Uri?, selfieUri: Uri?, apiClient: SecureApiClient
 ) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
@@ -320,47 +340,32 @@ private suspend fun submitUserInfo(
     val emergencyPermitUrl = uploadImage(emergencyVehiclePermitUri, "emergency_permits/$userId")
     val selfieUrl = uploadImage(selfieUri, "selfies/$userId")
 
-    // Verify that the selfie shows a face (you'll need to implement this)
-    if (!verifySelfieHasFace(selfieUri)) {
-        // Show error message
-        return
-    }
 
     // Create user data object
-    val userData = hashMapOf(
-        "firstName" to firstName,
-        "lastName" to lastName,
-        "gender" to gender,
-        "dob" to dob,
-        "mobileNo" to mobileNo,
-        "drivingLicenseNo" to drivingLicenseNo,
-        "aadharNo" to aadharNo,
-        "emergencyVehiclePermitUrl" to emergencyPermitUrl,
-        "selfieUrl" to selfieUrl
+    val userData = UserBase(
+        id = userId,
+        name = "$firstName $lastName",
+        date_of_birth = dob,
+        mobile_number = mobileNo,
+        license_number = drivingLicenseNo,
+        vehicle_number = vehicleNo,
+        aadhar_number = aadharNo,
+        permit_uri = emergencyPermitUrl ?: "",
+        selfie_uri = selfieUrl ?: ""
     )
-
-    // Send data to your API server
-    sendDataToApiServer(userId, userData)
 
     // Create document in Firestore
     FirebaseFirestore.getInstance().collection("users").document(userId)
+
+    val verification = apiClient.sendUserData(userData)
+
+    Log.d(TAG, "User data submitted: $verification")
 }
 
 private suspend fun uploadImage(uri: Uri?, path: String): String? {
     if (uri == null) return null
     val ref = FirebaseStorage.getInstance().reference.child(path)
     return ref.putFile(uri).await().storage.downloadUrl.await().toString()
-}
-
-private fun verifySelfieHasFace(selfieUri: Uri?): Boolean {
-    // Implement face detection logic here
-    // You might want to use ML Kit or another face detection library
-    return true // Placeholder
-}
-
-private suspend fun sendDataToApiServer(userId: String, userData: Map<String, Any?>) {
-    // Implement your API call here
-    // You might want to use Retrofit or another networking library
 }
 
 @Composable

@@ -5,11 +5,11 @@ from fastapi import FastAPI
 
 from server.cache import update_all_signal_ids_cache
 from server.database import engine, Base
-from server.routers import signals, auth, encryption
+from server.routers import signals, auth, encryption, android_api
 
 app = FastAPI()
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -25,6 +25,7 @@ async def startup_event():
 app.include_router(signals.router)
 app.include_router(auth.router)
 app.include_router(encryption.router)
+app.include_router(android_api.router)
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,9 +1,7 @@
-import uuid
-
-from sqlalchemy import Column, String, Float, DateTime, func, UniqueConstraint
+from sqlalchemy import Column, String, Float, Integer, DateTime, func, UniqueConstraint, LargeBinary, Boolean
 from sqlalchemy.dialects.postgresql import UUID
-
 from server.database import Base
+import uuid
 
 
 class TrafficSignal(Base):
@@ -19,3 +17,12 @@ class TrafficSignal(Base):
     __table_args__ = (
         UniqueConstraint('latitude', 'longitude', name='uix_latitude_longitude'),
     )
+
+
+class ClientKey(Base):
+    __tablename__ = "client_keys"
+
+    client_id = Column(String, primary_key=True, index=True)
+    shared_key = Column(LargeBinary)
+    is_valid = Column(Boolean, default=True)
+    last_updated = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

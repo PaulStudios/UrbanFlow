@@ -23,6 +23,8 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import com.google.gson.Gson
+import org.paulstudios.datasurvey.network.VerifyResponse
 import org.paulstudios.urbanflow.utils.logDataReceived
 import org.paulstudios.urbanflow.utils.logDataSent
 import org.paulstudios.urbanflow.utils.logKeyExchange
@@ -48,6 +50,7 @@ class SecureApiClient(baseUrl: String, private val context: Context) {
 
     private lateinit var clientId: String
     private lateinit var keyPair: KeyPair
+
 
     private fun saveSharedKey(key: ByteArray) {
         val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
@@ -93,6 +96,10 @@ class SecureApiClient(baseUrl: String, private val context: Context) {
     }
 
     suspend fun ensureValidKey() {
+        if (::clientId.isInitialized.not()) {
+            Log.d(TAG, "Client ID is empty, fetching keys")
+            getKeys()
+        }
         if (sharedKey == null) {
             Log.d(TAG, "Shared key is null, performing key exchange")
             exchangeKey()
@@ -108,7 +115,7 @@ class SecureApiClient(baseUrl: String, private val context: Context) {
         }
     }
 
-    suspend fun getKeys() {
+    private suspend fun getKeys() {
         withContext(Dispatchers.IO) {
             try {
                 // Try to load the existing shared key
@@ -212,11 +219,56 @@ class SecureApiClient(baseUrl: String, private val context: Context) {
         }
     }
 
+    suspend fun sendUserData(user: UserBase): VerifyResponse? {
+        var verifyResponse: VerifyResponse? = null
+        withContext(Dispatchers.IO) {
+            ensureValidKey()
+
+            try {
+                val gson = Gson()
+                val userJson = gson.toJson(user)
+
+                val (encryptedData, iv) = CryptoUtils.encrypt(userJson.toByteArray(), sharedKey!!)
+                val encryptedDataBase64 = Base64.encodeToString(encryptedData, Base64.NO_WRAP)
+                val ivBase64 = Base64.encodeToString(iv, Base64.NO_WRAP)
+
+                val request = EncryptedDataRequest(clientId, encryptedDataBase64, ivBase64)
+                Log.d(TAG, "Sending user data: ${request.encrypted_data}")
+
+                val response = encyptedApiService.verifyUser(request)
+                logDataSent(true, clientId)
+
+                if (response.isSuccessful) {
+                    Log.d(TAG, "Received data: ${response.body()?.encrypted_data}")
+                    val body = response.body() ?: throw Exception("Empty response body")
+                    val encryptedData = Base64.decode(body.encrypted_data, Base64.NO_WRAP)
+                    val iv = Base64.decode(body.iv, Base64.NO_WRAP)
+
+                    val decryptedData = CryptoUtils.decrypt(encryptedData, sharedKey!!, iv)
+                    val decryptedString = String(decryptedData)
+                    Log.d(TAG, "Decrypted data: $decryptedString")
+                    // Deserialize JSON string to VerifyResponse object
+                    val gson = Gson()
+                    verifyResponse = gson.fromJson(decryptedString, VerifyResponse::class.java)
+
+                    logDataReceived(true, clientId)
+                    verifyResponse
+                } else {
+                    logDataReceived(false, clientId, response.errorBody()?.string())
+                    throw Exception("Failed to receive data: ${response.code()} - ${response.errorBody()?.string()}")
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Error sending user data", e)
+                logDataSent(false, clientId, e.message)
+            }
+        }
+        return verifyResponse
+    }
+
     suspend fun receiveData(): String {
         return withContext(Dispatchers.IO) {
-            if (sharedKey == null) {
-                exchangeKey()
-            }
+            ensureValidKey()
 
             val response = encyptedApiService.receiveData(clientId)
             if (response.isSuccessful) {
