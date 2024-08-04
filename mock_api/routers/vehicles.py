@@ -50,7 +50,7 @@ async def get_vehicle_registration(
         db: AsyncSession = Depends(database.get_db),
         api_key: auth.models.APIKey = Depends(auth.get_api_key)
 ):
-    if not re.match(r'^[A-Z]{2}-\d{2}-\d{4}-\d{7}$', vehicle_number):
+    if not re.match(r'^[A-Z]{2}-\d{2}-[A-Z]{1,2}-\d{1,4}$', vehicle_number):
         raise HTTPException(status_code=400, detail="Invalid vehicle number")
     query = select(models.VehicleRegistration).where(models.VehicleRegistration.number == vehicle_number)
     result = await db.execute(query)

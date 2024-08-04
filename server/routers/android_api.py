@@ -14,6 +14,7 @@ from Crypto.Cipher import AES
 from server.auth import auth
 from server.database import get_db
 from server.schemas import UserCreate, VerificationResponse, EncryptedDataRequest
+from server.utils.api_access import get_apikey
 from server.utils.encyption_key import load_shared_key
 from server.utils.firebase.connection import firestore_db, firebase_bucket
 from server.utils.serializers import deserialize_user, serialize_verify_response
@@ -73,14 +74,17 @@ async def verify_user(
 
             user_doc = firestore_db.collection("users").document(user_id)
 
-
-
             response = VerificationResponse(
                 status=False,
                 checked_at=datetime.now(),
             )
-            license_response = requests.get(f"{api_url}/licenses/{license_number}").json()
-            vehicle_response = requests.get(f"{api_url}/vehicles/{vehicle_number}").json()
+            headers = {
+                "X-API-Key": get_apikey(api_url)
+            }
+            license_response = requests.get(f"{api_url}/license/{license_number}", headers=headers).json()
+            vehicle_response = requests.get(f"{api_url}/vehicle/{vehicle_number}", headers=headers).json()
+            logger.info(f"Vehicle response: {vehicle_response}")
+            logger.info(f"License response: {license_response}")
         except ValueError as ve:
             logger.error(f"Decryption failed for client {request.client_id}: {str(ve)}")
             raise HTTPException(status_code=400, detail="Decryption failed")

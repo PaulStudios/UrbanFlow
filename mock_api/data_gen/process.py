@@ -13,7 +13,7 @@ from mock_api.data_gen.uploader import upload_license, upload_vehicle
 
 load_dotenv("../../.env")
 
-base_url = os.getenv("VERIFICATION_API")
+base_url = os.getenv("VEHICLE_API")
 api_key = "<KEY>"
 
 # Log in the user to get credentials for the API key

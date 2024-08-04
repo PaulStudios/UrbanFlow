@@ -259,7 +259,7 @@ def run():
     df.to_csv('route_prediction_ai/final_data.csv', index=False)
     logging.info("Data saved to final_data.csv")
 
-    reset_db.run("route_prediction_ai/final_data.csv")
+    # reset_db.run("route_prediction_ai/final_data.csv")
 
 
 if __name__ == "__main__":

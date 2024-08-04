@@ -1,8 +1,9 @@
 import asyncio
 import logging
-from threading import Lock
 
 from cachetools import TTLCache
+from threading import Lock
+
 from sqlalchemy import text
 
 from server.database import get_db
