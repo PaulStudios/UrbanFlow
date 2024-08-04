@@ -1,7 +1,8 @@
 import asyncio
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
+from fastapi.responses import PlainTextResponse
 
 from server.cache import update_all_signal_ids_cache
 from server.database import engine, Base
@@ -26,6 +27,10 @@ app.include_router(signals.router)
 app.include_router(auth.router)
 app.include_router(encryption.router)
 app.include_router(android_api.router)
+
+@app.get("/status", response_class=PlainTextResponse)
+async def healthcheck(request: Request):
+    return "OK"
 
 if __name__ == "__main__":
     import uvicorn
