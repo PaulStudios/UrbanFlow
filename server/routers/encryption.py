@@ -7,13 +7,14 @@ from Crypto.Hash import SHA256
 from Crypto.Protocol.KDF import HKDF
 from Crypto.PublicKey import ECC
 from Crypto.Util.Padding import pad, unpad
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from mock_api.auth import auth
 from server.database import get_db
 from server.models import ClientKey
+from server.routers.auth import ADMIN_ACCESS_LIST
 from server.schemas import PublicKeyRequest, EncryptedDataRequest
 from server.utils.encyption_key import server_key, save_shared_key, perform_hkdf, load_shared_key, \
     generate_or_load_server_key
@@ -115,9 +116,16 @@ async def check_key_validity(client_id: str, db: AsyncSession = Depends(get_db))
 
 @router.post("/invalidate_keys")
 async def invalidate_keys(
+        request: Request,
         db: AsyncSession = Depends(get_db, ),
         api_key: auth.models.APIKey = Depends(auth.get_api_key)
 ):
+    client_host = request.client.host
+    if client_host not in ADMIN_ACCESS_LIST:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access Restricted"
+        )
     try:
         generate_or_load_server_key(del_key=True)
         await db.execute(update(ClientKey).values(is_valid=False))

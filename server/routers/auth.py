@@ -1,18 +1,28 @@
+import logging
+import os
+from datetime import datetime, timedelta, timezone
+
+from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException, status, Request
-from pydantic import UUID4
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from server import models, schemas, database, cache
+
+from server import database
 from server.auth import auth
-from typing import List
-from datetime import datetime, timedelta, timezone
-from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
 
+logger = logging.getLogger(__name__)
+
+load_dotenv()
+ADMIN_IP = os.getenv("ADMIN_IP")
+logger.info(f"Admin IP: {ADMIN_IP}")
+
+ADMIN_ACCESS_LIST = ['127.0.0.1', 'localhost', '::1', ADMIN_IP]
 
 @router.post("/register", response_model=auth.schemas.User)
 async def register_user(
@@ -20,9 +30,9 @@ async def register_user(
         user: auth.schemas.UserCreate,
         db: AsyncSession = Depends(database.get_db)
 ):
-    # Check if the request is coming from localhost
+
     client_host = request.client.host
-    if client_host not in ['127.0.0.1', 'localhost', '::1']:
+    if client_host not in ADMIN_ACCESS_LIST:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access Restricted"
