@@ -1,16 +1,4 @@
 ﻿requests~=2.32.3
-pandas~=2.2.2
-haversine~=2.8.1
-joblib~=1.4.2
-matplotlib~=3.9.1
-numpy~=1.26.4
-optuna~=3.6.1
-tensorflow~=2.17.0
-filterpy~=1.4.5
-prophet~=1.1.5
-scikit-learn~=1.5.1
-statsmodels~=0.14.2
-xgboost~=2.1.0
 fastapi~=0.111.1
 uvicorn~=0.30.3
 psycopg2-binary~=2.9.9
