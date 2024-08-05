@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<paths>
-    <external-path name="images" path="Android/data/org.paulstudios.urbanflow/files/Pictures" />
-    <cache-path name="cache_images" path="/Android/data/org.paulstudios.urbanflow/cache_images" />
-</paths>
