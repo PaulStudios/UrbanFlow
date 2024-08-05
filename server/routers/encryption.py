@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from mock_api.auth import auth
+from server.auth import auth
 from server.database import get_db
 from server.models import ClientKey
 from server.routers.auth import ADMIN_ACCESS_LIST
