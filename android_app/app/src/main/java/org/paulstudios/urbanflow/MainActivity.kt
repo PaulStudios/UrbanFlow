@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
-        secureApiClient = SecureApiClient("http://10.0.2.2:8000/", context = this)
+        secureApiClient = SecureApiClient("https://urbanflow.onrender.com/", context = this)
 
         // Perform key exchange when the app starts
         GlobalScope.launch {

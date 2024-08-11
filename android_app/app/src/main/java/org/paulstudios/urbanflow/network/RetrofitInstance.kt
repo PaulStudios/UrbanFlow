@@ -5,7 +5,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
-    private const val BASE_URL = "https://localhost:8000/"
+    private const val BASE_URL = "https://urbanflow.onrender.com"
 
     val api: TrackerAPI by lazy {
         Retrofit.Builder()
