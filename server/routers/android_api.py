@@ -22,7 +22,7 @@ from server.utils.utilities import create_directory
 
 router = APIRouter(
     prefix="/api/verify",
-    tags=["Authentication"],
+    tags=["Android API"],
 )
 
 load_dotenv()
