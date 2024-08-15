@@ -1,28 +1,52 @@
-from pydantic import BaseModel, UUID4
 from datetime import datetime
+from typing import Dict, List
+
+from pydantic import BaseModel, UUID4, Field
 
 
 class TrafficSignalBase(BaseModel):
+    """
+    Base schema for traffic signals.
+    """
     status: str
     latitude: float
     longitude: float
 
 
 class TrafficSignalCreate(TrafficSignalBase):
-    pass
+    """
+    Schema for creating a new traffic signal.
+    """
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "latitude": 37.7749,
+                "longitude": -122.4194,
+                "status": "green"
+            }
+        }
 
 
 class TrafficSignalUpdate(BaseModel):
+    """
+    Schema for updating an existing traffic signal's status.
+    """
     status: str
 
 
 class TrafficSignal(TrafficSignalBase):
+    """
+    Schema representing a traffic signal with an ID and updated_at timestamp.
+    """
     signal_id: UUID4
-    status: str
-    updated_at: datetime
 
     class Config:
         orm_mode = True
+
+
+class BatchSignalUpdate(BaseModel):
+    updates: List[Dict[str, str]]
 
 
 class UserBase(BaseModel):
@@ -58,3 +82,33 @@ class EncryptedDataRequest(BaseModel):
     client_id: str
     encrypted_data: str
     iv: str
+
+
+class VehicleBase(BaseModel):
+    id: UUID4
+    type: str
+    origin: str
+    destination: str
+
+    class Config:
+        orm_mode = True
+
+
+class VehicleCreate(BaseModel):
+    type: str
+    origin: str
+    destination: str
+
+    class Config:
+        orm_mode = True
+
+
+class VehicleRegistrationResponse(BaseModel):
+    id: UUID4
+    status: bool
+    detail: str
+    origin: str
+    destination: str
+
+    class Config:
+        orm_mode = True

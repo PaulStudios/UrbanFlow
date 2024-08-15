@@ -4,7 +4,8 @@ import requests
 from datetime import datetime, timedelta, timezone
 import uuid
 
-base_url = "http://localhost:8000"
+base_url = "https://urbanflow.onrender.com/"
+base_url = "http://localhost:8000/"
 
 # Register a new user
 register_data = {
@@ -20,8 +21,8 @@ else:
 
 # Log in the user to get credentials for the API key
 login_data = {
-    "username": "new_user",
-    "password": "secure_password"
+    "username": "tester45",
+    "password": "tester123"
 }
 login_response = requests.post(f"{base_url}/auth/token", data=login_data)
 if login_response.status_code == 200:
@@ -78,15 +79,11 @@ def create_traffic_signal(latitude, longitude, status="None"):
     else:
         print("Failed to create traffic signal:", signal_response.json())
 
-# Sample data for 15 traffic signals
-traffic_signals = [
-    {"latitude": 13.0827, "longitude": 80.2707, "status": "None"},
-    {"latitude": 13.0830, "longitude": 80.2710, "status": "None"},
-]
+traffic_signals = []
 
 # Iterate over the sample data and create each traffic signal
 for signal in traffic_signals:
-    create_traffic_signal(signal["latitude"], signal["longitude"], signal["status"])
+    create_traffic_signal(signal["latitude"], signal["longitude"])
 
 headers = {
     "X-API-Key": api_key,
@@ -94,6 +91,7 @@ headers = {
 
 response = requests.get(f"{base_url}/signals", headers=headers)
 if response.status_code == 200:
+    print(response.json())
     for signal in response.json():
         print(f"{signal['signal_id']}, {signal['status']}")
 else:

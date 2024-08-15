@@ -90,3 +90,4 @@ fabric.properties
 !/android_app/app/debug/
 /firebase-accesskey.json
 /server_key.pem
+/c.py
