@@ -24,6 +24,7 @@ import javax.crypto.spec.SecretKeySpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import com.google.gson.Gson
+import org.paulstudios.datasurvey.network.VehicleCreateRequest
 import org.paulstudios.datasurvey.network.VerifyResponse
 import org.paulstudios.urbanflow.utils.logDataReceived
 import org.paulstudios.urbanflow.utils.logDataSent
@@ -264,6 +265,33 @@ class SecureApiClient(baseUrl: String, private val context: Context) {
             }
         }
         return verifyResponse
+    }
+
+    suspend fun registerVehicle(vehicle: VehicleCreateRequest) {
+        withContext(Dispatchers.IO) {
+            ensureValidKey()
+
+            try {
+                val gson = Gson()
+                val vehicleJson = gson.toJson(vehicle)
+
+                val (encryptedData, iv) = CryptoUtils.encrypt(
+                    vehicleJson.toByteArray(),
+                    sharedKey!!
+                )
+                val encryptedDataBase64 = Base64.encodeToString(encryptedData, Base64.NO_WRAP)
+                val ivBase64 = Base64.encodeToString(iv, Base64.NO_WRAP)
+
+                val request = EncryptedDataRequest(clientId, encryptedDataBase64, ivBase64)
+                Log.d(TAG, "Sending vehicle registration data: ${request.encrypted_data}")
+
+                encyptedApiService.registerVehicle(request)
+                logDataSent(true, clientId)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error sending vehicle registration data", e)
+                logDataSent(false, clientId, e.message)
+            }
+        }
     }
 
     suspend fun receiveData(): String {

@@ -27,6 +27,9 @@ interface EncyptedApiService {
 
     @POST("api/verify/user")
     suspend fun verifyUser(@Body request: EncryptedDataRequest): Response<EncryptedDataResponse>
+
+    @POST("api/vehicle/create")
+    suspend fun registerVehicle(@Body request: EncryptedDataRequest): Response<Unit>
 }
 
 data class PublicKeyRequest(
@@ -56,4 +59,10 @@ data class UserBase(
 data class VerifyResponse(
     val status: String,
     val checked_at: String,
+)
+
+data class VehicleCreateRequest(
+    val type: String,
+    val origin: String,
+    val destination: String,
 )

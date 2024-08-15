@@ -22,6 +22,7 @@ import com.google.firebase.auth.OAuthProvider
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.paulstudios.datasurvey.network.VehicleCreateRequest
 import org.paulstudios.urbanflow.data.models.Screen
 import org.paulstudios.urbanflow.network.SecureApiClient
 import org.paulstudios.urbanflow.ui.theme.UrbanFlowTheme
@@ -82,6 +83,17 @@ class MainActivity : ComponentActivity() {
             // Receive encrypted data from the server
             val receivedData = secureApiClient.receiveData()
             println("Received data from server: $receivedData")
+
+            // TODO: Remove debug code below
+
+            val r = VehicleCreateRequest(
+                type = "Ambulance",
+                origin = "Madhyamgram, Barasat, IN",
+                destination = "Barasat, West Bengal, IN"
+            )
+
+            secureApiClient.registerVehicle(r)
+
         } catch (e: Exception) {
             // Handle communication error
             e.printStackTrace()

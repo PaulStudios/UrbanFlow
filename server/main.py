@@ -10,7 +10,7 @@ from sqlalchemy import text
 
 from server.cache import cache_manager, redis_pool
 from server.database import engine, Base, get_db
-from server.routers import signals, auth, encryption, android_api
+from server.routers import signals, auth, encryption, android_api, vehicles
 
 app = FastAPI()
 
@@ -60,6 +60,7 @@ app.include_router(signals.router)
 app.include_router(auth.router)
 app.include_router(encryption.router)
 app.include_router(android_api.router)
+app.include_router(vehicles.router)
 
 
 @app.get("/status", response_class=PlainTextResponse)

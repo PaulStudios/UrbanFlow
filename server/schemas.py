@@ -1,7 +1,7 @@
+from datetime import datetime
 from typing import Dict, List
 
-from pydantic import BaseModel, UUID4
-from datetime import datetime
+from pydantic import BaseModel, UUID4, Field
 
 
 class TrafficSignalBase(BaseModel):
@@ -82,3 +82,33 @@ class EncryptedDataRequest(BaseModel):
     client_id: str
     encrypted_data: str
     iv: str
+
+
+class VehicleBase(BaseModel):
+    id: UUID4
+    type: str
+    origin: str
+    destination: str
+
+    class Config:
+        orm_mode = True
+
+
+class VehicleCreate(BaseModel):
+    type: str
+    origin: str
+    destination: str
+
+    class Config:
+        orm_mode = True
+
+
+class VehicleRegistrationResponse(BaseModel):
+    id: UUID4
+    status: bool
+    detail: str
+    origin: str
+    destination: str
+
+    class Config:
+        orm_mode = True
